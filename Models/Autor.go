@@ -6,5 +6,4 @@ type Autor struct {
 	Nombre          string `json:"nombre"`
 	ApellidoPaterno string `json:"apellidoPaterno"`
 	ApellinaMaterno string `json:"apellinaMaterno"`
-	Nacionalidad    string `json:"nacionalidad"`
 }

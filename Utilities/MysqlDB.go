@@ -33,18 +33,25 @@ func InsertObject(table string, values []interface{}, fields []string) (bool, er
 		} else {
 			command += ","
 		}
-		fmt.Println(command)
 	}
 	command += " VALUES ("
 	for i := 0; i < len(values); i++ {
 		var valueString string = fmt.Sprintf("%v", values[i])
-		command += valueString
+		var typeVar string = fmt.Sprintf("%T", values[i])
+		if typeVar != "string" {
+			command += valueString
+		} else {
+			if valueString == "" {
+				command += "null"
+			} else {
+				command += "'" + valueString + "'"
+			}
+		}
 		if i == (len(fields) - 1) {
 			command += ")"
 		} else {
 			command += ","
 		}
-		fmt.Println(command)
 	}
 	result, err := ExecuteCommand(command)
 	if err != nil {
@@ -56,4 +63,41 @@ func InsertObject(table string, values []interface{}, fields []string) (bool, er
 			return false, nil
 		}
 	}
+}
+
+//GetObject : metodo que retorna un objeto segun parametros
+func GetObject(table string, selects []string, params []string, values []interface{}) (bool, interface{}) {
+	var command string
+
+	command += "SELECT "
+	if len(selects) == 0 {
+		command += "* "
+	} else {
+		for i := 0; i < len(selects); i++ {
+			if i == (len(selects) - 1) {
+				command += selects[i] + ","
+			} else {
+				command += selects[i]
+			}
+		}
+	}
+
+	command += " FROM " + table + " WHERE "
+
+	for i := 0; i < len(values); i++ {
+		var varType string = fmt.Sprintf("%T", values[i])
+		var varString string = fmt.Sprintf("%v", values[i])
+		if varType != "string" {
+			command += params[i] + "=" + varString
+		} else {
+			command += params[i] + "='" + varString + "'"
+		}
+		if i != (len(values) - 1) {
+			command += " AND "
+		}
+	}
+
+	fmt.Println(command)
+
+	return true,nil
 }

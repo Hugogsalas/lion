@@ -9,7 +9,7 @@ func ObjectValues(object interface{}) []interface{} {
 	e := reflect.ValueOf(object)
 	var arraybucket []interface{} 
 	for i := 0; i < e.NumField(); i++ {
-		arraybucket=append(arraybucket,e.Field(i))
+		arraybucket=append(arraybucket,e.Field(i).Interface())
 	}
 	return arraybucket
 }
