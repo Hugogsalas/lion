@@ -124,6 +124,5 @@ func GetObject(table string, selects []string, params []string, values []interfa
 		return nil,err
 	}
 
-	
 	return result,nil
 }
