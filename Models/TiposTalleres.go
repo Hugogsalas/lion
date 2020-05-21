@@ -1,7 +1,7 @@
 package models
 
-//TiposTallleres : Modelo de TiposTallleres
-type TiposTallleres struct {
+//TiposTalleres : Modelo de TiposTalleres
+type TiposTalleres struct {
 	ID          int    `json:"id"`
 	Descripcion string `json:"descripcion"`
 }
