@@ -18,6 +18,9 @@ func main() {
 	router.HandleFunc("/Sello/create", controllers.CreateSello).Methods("POST")
 	router.HandleFunc("/Stan/create", controllers.CreateStan).Methods("POST")
 	router.HandleFunc("/Sala/create", controllers.CreateSala).Methods("POST")
+	router.HandleFunc("/SalaExposicion/create", controllers.CreateSalaExposicion).Methods("POST")
+	router.HandleFunc("/SalaTaller/create", controllers.CreateSalaTaller).Methods("POST")
+	router.HandleFunc("/Taller/create", controllers.CreateTaller).Methods("POST")
 	router.HandleFunc("/Autor/create", controllers.CreateAutor).Methods("POST")
 	router.HandleFunc("/Itinerario/create", controllers.CreateItinerario).Methods("POST")
 
