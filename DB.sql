@@ -15,7 +15,7 @@ create table Autor(
     ID int primary key auto_increment not null,
     Nombre varchar(30) not null,
     ApellidoPaterno varchar(30) not null,
-    ApellinaMaterno varchar(30) not null
+    ApellidoMaterno varchar(30) not null
 );
 
 create table Editorial(
@@ -57,7 +57,7 @@ create table Libro(
 
 create table Sala(
     ID int primary key auto_increment not null,
-    Nombre varchar(10) not null
+    Nombre varchar(20) not null
 );
 
 create table Stan(

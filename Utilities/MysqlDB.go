@@ -9,7 +9,7 @@ import (
 
 //ExecuteCommand : Metodo de execucion de un query que no retorna nada
 func ExecuteCommand(command string) (interface{}, error) {
-	db, err := sql.Open("mysql", "root:3$trella@tcp(127.0.0.1:3306)/lioness")
+	db, err := sql.Open("mysql", "root:ainerbds117@@tcp(127.0.0.1:3306)/lioness")
 	if err != nil {
 		return nil, err
 	}
