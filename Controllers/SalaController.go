@@ -10,7 +10,7 @@ import (
 	utilities "../Utilities"
 )
 
-//CreateSala : Metodo de insercion de una  nueva sala
+//CreateSala : Metodo de insercion de una nueva sala
 func CreateSala(writter http.ResponseWriter, request *http.Request) {
 	var sala models.Sala
 	err := json.NewDecoder(request.Body).Decode(&sala)

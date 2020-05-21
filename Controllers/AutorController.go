@@ -10,7 +10,7 @@ import (
 	utilities "../Utilities"
 )
 
-//CreateAutor : Metodo de insercion de una  nueva autor
+//CreateAutor : Metodo de insercion de un nuevo autor
 func CreateAutor(writter http.ResponseWriter, request *http.Request) {
 	var autor models.Autor
 	err := json.NewDecoder(request.Body).Decode(&autor)

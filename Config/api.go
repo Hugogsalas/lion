@@ -10,9 +10,9 @@ import (
 func main() {
 	router := mux.NewRouter().StrictSlash(true)
 	router.HandleFunc("/User/create", controllers.CreateUser).Methods("POST")
-	router.HandleFunc("/User/get", controllers.GetUser).Methods("POST")
-	router.HandleFunc("/Lib/create", controllers.CreateLib).Methods("POST")
-	router.HandleFunc("/Lib/get", controllers.GetLib).Methods("POST")
+	router.HandleFunc("/User/login", controllers.LoginUser).Methods("POST")
+	router.HandleFunc("/Libro/create", controllers.CreateLibro).Methods("POST")
+	router.HandleFunc("/Libro/get", controllers.GetLib).Methods("POST")
 	router.HandleFunc("/Editorial/create", controllers.CreateEditorial).Methods("POST")
 	router.HandleFunc("/Exposicion/create", controllers.CreateExposicion).Methods("POST")
 	router.HandleFunc("/TipoTaller/create", controllers.CreateTipoTaller).Methods("POST")

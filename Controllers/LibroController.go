@@ -12,8 +12,8 @@ import (
 	utilities "../Utilities"
 )
 
- //CreateLib : Metodo de insercion de un nuevo usuario                                                    
-func CreateLib(writter http.ResponseWriter, request *http.Request) {
+ //CreateLibro : Metodo de insercion de un nuevo Libro                                                    
+func CreateLibro(writter http.ResponseWriter, request *http.Request) {
 	var libro models.Libro
 	err := json.NewDecoder(request.Body).Decode(&libro)
 
