@@ -37,6 +37,7 @@ func ExecuteQuery(command string) (*sql.Rows, error) {
 }
 
 
+
 //InsertObject : inserta un objeto en la tabla especificada
 func InsertObject(table string, values []interface{}, fields []string) (bool, error) {
 	var command string
