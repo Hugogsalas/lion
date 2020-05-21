@@ -4,6 +4,7 @@ use lioness;
 
 create table Usuarios(
     ID int primary key auto_increment not null,
+    Correo varchar(30) not null,
     Nombre varchar(15) not null,
     ApellidoPaterno varchar(15) not null,
     ApellidoMaterno varchar(15) not null,

@@ -10,7 +10,7 @@ import (
 	utilities "../Utilities"
 )
 
-//CreateItinerarioTaller : Metodo de insercion de una  nueva itinerarioTaller
+//CreateItinerarioTaller : Metodo de insercion de un nuevo itinerarioTaller
 func CreateItinerarioTaller(writter http.ResponseWriter, request *http.Request) {
 	var itinerarioTaller models.ItinerarioTaller
 	err := json.NewDecoder(request.Body).Decode(&itinerarioTaller)
