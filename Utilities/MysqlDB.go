@@ -9,7 +9,7 @@ import (
 
 //ExecuteCommand : Metodo de execucion de un query que no retorna nada
 func ExecuteCommand(command string) (interface{}, error) {
-	db, err:=sql.Open("mysql","root:ainerbds117@@tcp(127.0.0.1:3306)/lioness") 
+	db, err := sql.Open("mysql", "root:emillie14@@tcp(127.0.0.1:3308)/lioness")
 	if err != nil {
 		return nil, err
 	}
@@ -23,8 +23,7 @@ func ExecuteCommand(command string) (interface{}, error) {
 
 //ExecuteQuery : Metodo de execucion de un query que retorna objetos
 func ExecuteQuery(command string) (*sql.Rows, error) {
-	db, err:=sql.Open("mysql","root:ainerbds117@@tcp(127.0.0.1:3306)/lioness") 
-	
+	db, err := sql.Open("mysql", "root:emillie14@@tcp(127.0.0.1:3308)/lioness")
 	if err != nil {
 		return nil, err
 	}
@@ -35,6 +34,8 @@ func ExecuteQuery(command string) (*sql.Rows, error) {
 	}
 	return result, nil
 }
+
+
 
 //InsertObject : inserta un objeto en la tabla especificada
 func InsertObject(table string, values []interface{}, fields []string) (bool, error) {
@@ -118,7 +119,7 @@ func GetObject(table string, selects []string, params []string, values []interfa
 			multiple=true
 		}
 	}
-
+	fmt.Println(command)
 	result,err:=ExecuteQuery(command)
 
 	if err!=nil{

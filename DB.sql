@@ -50,9 +50,9 @@ create table Sello(
 
 create table Libro(
     ID int primary key auto_increment not null,
-    Titulo varchar(50) not null,
     IDAutor int not null,
     Precio float not null,
+    Titulo varchar(50) not null,
     FOREIGN KEY (IDAutor) REFERENCES Autor(ID) ON DELETE CASCADE
 );
 
