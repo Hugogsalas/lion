@@ -28,6 +28,9 @@ func main() {
 	router.HandleFunc("/Itinerario/create", controllers.CreateItinerario).Methods("POST")
 	router.HandleFunc("/ItinerarioExposicion/create", controllers.CreateItinerarioExposicion).Methods("POST")
 	router.HandleFunc("/ItinerarioTaller/create", controllers.CreateItinerarioTaller).Methods("POST")
+	router.HandleFunc("/AutorLibro/create", controllers.CreateAutorLibro).Methods("POST")
+	router.HandleFunc("/EditorialLibro/create", controllers.CreateEditorialLibro).Methods("POST")
+	router.HandleFunc("/SelloLibro/create", controllers.CreateSelloLibro).Methods("POST")
 
 	log.Fatal(http.ListenAndServe(":8080", router))
 }
