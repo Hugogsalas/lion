@@ -14,6 +14,7 @@ func main() {
 	router.HandleFunc("/Libro/create", controllers.CreateLibro).Methods("POST")
 	router.HandleFunc("/Libro/get", controllers.GetLib).Methods("POST")
 	router.HandleFunc("/Editorial/create", controllers.CreateEditorial).Methods("POST")
+	router.HandleFunc("/Editorial/get", controllers.GetEditorial).Methods("POST")
 	router.HandleFunc("/Exposicion/create", controllers.CreateExposicion).Methods("POST")
 	router.HandleFunc("/TipoTaller/create", controllers.CreateTipoTaller).Methods("POST")
 	router.HandleFunc("/TipoExposicion/create", controllers.CreateTipoExposicion).Methods("POST")
