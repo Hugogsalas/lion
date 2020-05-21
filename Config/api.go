@@ -20,6 +20,7 @@ func main() {
 	router.HandleFunc("/Sala/create", controllers.CreateSala).Methods("POST")
 	router.HandleFunc("/Autor/create", controllers.CreateAutor).Methods("POST")
 	router.HandleFunc("/Itinerario/create", controllers.CreateItinerario).Methods("POST")
+	router.HandleFunc("/ItinerarioExposicion/create", controllers.CreateItinerarioExposicion).Methods("POST")
 
 	log.Fatal(http.ListenAndServe(":8080", router))
 }
