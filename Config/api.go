@@ -14,6 +14,7 @@ func main() {
 	router.HandleFunc("/Libro/create", controllers.CreateLibro).Methods("POST")
 	router.HandleFunc("/Libro/get", controllers.GetLib).Methods("POST")
 	router.HandleFunc("/Editorial/create", controllers.CreateEditorial).Methods("POST")
+	router.HandleFunc("/Editorial/get", controllers.GetEditorial).Methods("POST")
 	router.HandleFunc("/Exposicion/create", controllers.CreateExposicion).Methods("POST")
 	router.HandleFunc("/TipoTaller/create", controllers.CreateTipoTaller).Methods("POST")
 	router.HandleFunc("/TipoExposicion/create", controllers.CreateTipoExposicion).Methods("POST")
@@ -28,6 +29,9 @@ func main() {
 	router.HandleFunc("/Itinerario/create", controllers.CreateItinerario).Methods("POST")
 	router.HandleFunc("/ItinerarioExposicion/create", controllers.CreateItinerarioExposicion).Methods("POST")
 	router.HandleFunc("/ItinerarioTaller/create", controllers.CreateItinerarioTaller).Methods("POST")
+	router.HandleFunc("/AutorLibro/create", controllers.CreateAutorLibro).Methods("POST")
+	router.HandleFunc("/EditorialLibro/create", controllers.CreateEditorialLibro).Methods("POST")
+	router.HandleFunc("/SelloLibro/create", controllers.CreateSelloLibro).Methods("POST")
 
 	log.Fatal(http.ListenAndServe(":8080", router))
 }

@@ -50,7 +50,7 @@ func CreateLibro(writter http.ResponseWriter, request *http.Request) {
 }
 
 
-//GetLib : Metodo que regresa autores segun parametros
+//GetLib : Metodo que regresa libros segun parametros
 func GetLib(writter http.ResponseWriter, request *http.Request) {
 	var libro models.Libro
 	err := json.NewDecoder(request.Body).Decode(&libro)
@@ -66,19 +66,23 @@ func GetLib(writter http.ResponseWriter, request *http.Request) {
 		fmt.Println(libValues)
 
 		//Limpia de los atributos del objeto
-		for i := 0; i < 3; i++ {
+		for i := 0; i < 2; i++ {
 			if libValues[i] == 0{
 				libValues[i] = nil
 			}
+		}
+		if libValues[2]==0.0{
+			libValues[2]=nil
 		}
 		if libValues[3] == "" {
 			libValues[3] = nil
 		}
 
 
-		libRows, err := utilities.GetObject("libro", nil, libStrings, libValues)
+		libRows, err := utilities.GetObject("Libro", nil, libStrings, libValues)
 		if err == nil {
 			librosResultado, err := QueryToLibro(libRows)
+			fmt.Println(librosResultado)
 			if err == nil {
 				if len(librosResultado) > 0 {
 					jsonResponse.Set("Exito", true)
