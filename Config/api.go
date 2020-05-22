@@ -20,6 +20,7 @@ func main() {
 	router.HandleFunc("/TipoTaller/create", controllers.CreateTipoTaller).Methods("POST")
 	router.HandleFunc("/TipoExposicion/create", controllers.CreateTipoExposicion).Methods("POST")
 	router.HandleFunc("/Sello/create", controllers.CreateSello).Methods("POST")
+	router.HandleFunc("/Sello/get", controllers.GetSello).Methods("POST")
 	router.HandleFunc("/Stan/create", controllers.CreateStan).Methods("POST")
 	router.HandleFunc("/Sala/create", controllers.CreateSala).Methods("POST")
 	router.HandleFunc("/SalaExposicion/create", controllers.CreateSalaExposicion).Methods("POST")
