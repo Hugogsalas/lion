@@ -3,7 +3,6 @@ package controllers
 import (
 	"database/sql"
 	"encoding/json"
-	"fmt"
 	"net/http"
 
 	"github.com/bitly/go-simplejson"
@@ -61,8 +60,7 @@ func GetAutor(writter http.ResponseWriter, request *http.Request) {
 		autorValues = utilities.ObjectValues(autor)
 		autorStrings = utilities.ObjectFields(autor)
 
-		fmt.Println(autorStrings)
-		fmt.Println(autorValues)
+
 		//Limpia de los atributos del objeto
 		if autorValues[0] == 0 {
 			autorValues[0] = nil
