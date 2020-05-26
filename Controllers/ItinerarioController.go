@@ -76,7 +76,7 @@ func GetItinerario(writter http.ResponseWriter, request *http.Request) {
 		
 	
 
-		itinRows, err := utilities.GetObject("Itinerario", nil, itinStrings, itinValues)
+		itinRows, err := utilities.GetObject([]string{"itinerario"}, nil, itinStrings, itinValues)
 		if err == nil {
 			itinerariosResultado, err := QueryToItinerario(itinRows)
 			fmt.Println(itinerariosResultado)

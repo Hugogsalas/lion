@@ -72,7 +72,7 @@ func GetAutor(writter http.ResponseWriter, request *http.Request) {
 			}
 		}
 
-		autorRows, err := utilities.GetObject("Autor", nil, autorStrings, autorValues)
+		autorRows, err := utilities.GetObject([]string{"Autor"}, nil, autorStrings, autorValues)
 		if err == nil {
 			autoresResultado, err := QueryToAutor(autorRows)
 			if err == nil {

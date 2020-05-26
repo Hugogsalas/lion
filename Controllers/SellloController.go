@@ -77,7 +77,7 @@ func GetSello(writter http.ResponseWriter, request *http.Request) {
 			}
 		}
 
-		selloRows, err := utilities.GetObject("Sello", nil, selloStrings, selloValues)
+		selloRows, err := utilities.GetObject([]string{"Sello"}, nil, selloStrings, selloValues)
 		if err == nil {
 			selloResultado, err := QueryToSello(selloRows)
 			if err == nil {
@@ -87,7 +87,7 @@ func GetSello(writter http.ResponseWriter, request *http.Request) {
 					jsonResponse.Set("Editorial", selloResultado)
 				} else {
 					jsonResponse.Set("Exito", false)
-					jsonResponse.Set("Message", "No se encontraron editoriales")
+					jsonResponse.Set("Message", "No se encontraron sellos")
 				}
 			} else {
 				jsonResponse.Set("Exito", false)

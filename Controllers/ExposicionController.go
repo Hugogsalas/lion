@@ -80,7 +80,7 @@ func GetExposicion(writter http.ResponseWriter, request *http.Request) {
 	
 
 
-		expRows, err := utilities.GetObject("Exposicion", nil, expStrings, expValues)
+		expRows, err := utilities.GetObject([]string{"Exposicion"}, nil, expStrings, expValues)
 		if err == nil {
 			exposicionesResultado, err := QueryToExposicion(expRows)
 			fmt.Println(exposicionesResultado)

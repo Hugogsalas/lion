@@ -12,7 +12,7 @@ func main() {
 	router.HandleFunc("/User/create", controllers.CreateUser).Methods("POST")
 	router.HandleFunc("/User/login", controllers.LoginUser).Methods("POST")
 	router.HandleFunc("/Libro/create", controllers.CreateLibro).Methods("POST")
-	router.HandleFunc("/Libro/get", controllers.GetLib).Methods("POST")
+	router.HandleFunc("/Libro/get", controllers.GetLibro).Methods("POST")
 	router.HandleFunc("/Editorial/create", controllers.CreateEditorial).Methods("POST")
 	router.HandleFunc("/Editorial/get", controllers.GetEditorial).Methods("POST")
 	router.HandleFunc("/Exposicion/create", controllers.CreateExposicion).Methods("POST")
@@ -33,6 +33,7 @@ func main() {
 	router.HandleFunc("/ItinerarioExposicion/create", controllers.CreateItinerarioExposicion).Methods("POST")
 	router.HandleFunc("/ItinerarioTaller/create", controllers.CreateItinerarioTaller).Methods("POST")
 	router.HandleFunc("/AutorLibro/create", controllers.CreateAutorLibro).Methods("POST")
+	router.HandleFunc("/AutorLibro/get", controllers.GetAutorLibro).Methods("POST")
 	router.HandleFunc("/EditorialLibro/create", controllers.CreateEditorialLibro).Methods("POST")
 	router.HandleFunc("/SelloLibro/create", controllers.CreateSelloLibro).Methods("POST")
 
