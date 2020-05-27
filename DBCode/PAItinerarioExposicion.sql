@@ -2,45 +2,182 @@
 DELIMITER $$
 create procedure PAItinerarioExposicion(
 	in IDItinerario int,
-    in IDExposicion int
+    in IDExposicion int,
+    in Horario time 
 )
 begin
 	if IDItinerario!=0 and IDExposicion!=0 then
-		select 
-		Itinerario.ID,
-		Itinerario.ApellidoPaterno,
-		Libro.Titulo,
-		Libro.precio 
-		from lioness.Itinerario,lioness.libro,lioness.AutorLibro
-		where
-        Autor.ID=IDAutor and 
-        Libro.ID=IDLibro and 
-        AutorLibro.IDAutor=IDAutor and 
-        AutorLibro.IDLibro=IDLibro;
-	elseif IDAutor!=0 then
-		select 
-		Autor.Nombre,
-		Autor.ApellidoPaterno,
-		Autor.ApellidoMaterno,
-		Libro.Titulo,
-		Libro.precio 
-		from lioness.Autor,lioness.libro,lioness.AutorLibro
-		where 
-        Autor.ID=IDAutor and
-        AutorLibro.IDLibro=Libro.ID and
-        AutorLibro.IDAutor=IDAutor;
-    else 
-		select 
-		Autor.Nombre,
-		Autor.ApellidoPaterno,
-		Autor.ApellidoMaterno,
-		Libro.Titulo,
-		Libro.precio 
-		from lioness.Autor,lioness.libro,lioness.AutorLibro
-		where 
-        Libro.ID=IDLibro and
-        AutorLibro.IDAutor=Autor.ID and
-        AutorLibro.IDLibro=IDLibro;
+		if Horario is not null then
+			select
+			Itinerario.ID,
+			Itinerario.Dia,
+			Exposicion.ID,
+			Exposicion.Presentador,
+			Exposicion.Duracion,
+			Exposicion.Titulo,
+			TiposExposicion.Descripcion,
+            ItinerarioExposicion.Horario
+			from 
+			lioness.Itinerario,
+			lioness.Exposicion,
+			lioness.TiposExposicion,
+			lioness.ItinerarioExposicion
+			where
+			Itinerario.ID=IDItinerario and 
+			Exposicion.ID=IDExposicion and 
+			TiposExposicion.ID=Exposicion.IDTipo and
+			ItinerarioExposicion.IDItinerario=IDItinerario and 
+			ItinerarioExposicion.IDExposicion=IDExposicion and
+            ItinerarioExposicion.Horario=Horario;
+        else
+			select 
+			Itinerario.ID,
+			Itinerario.Dia,
+			Exposicion.ID,
+			Exposicion.Presentador,
+			Exposicion.Duracion,
+			Exposicion.Titulo,
+			TiposExposicion.Descripcion,
+            ItinerarioExposicion.Horario
+			from 
+			lioness.Itinerario,
+			lioness.Exposicion,
+			lioness.TiposExposicion,
+			lioness.ItinerarioExposicion
+			where
+			Itinerario.ID=IDItinerario and 
+			Exposicion.ID=IDExposicion and 
+			TiposExposicion.ID=Exposicion.IDTipo and
+			ItinerarioExposicion.IDItinerario=IDItinerario and 
+			ItinerarioExposicion.IDExposicion=IDExposicion;
+        end if;
+	elseif IDExposicion!=0 then
+		if Horario is not null then
+			select 
+			Itinerario.ID,
+			Itinerario.Dia,
+			Exposicion.ID,
+			Exposicion.Presentador,
+			Exposicion.Duracion,
+			Exposicion.Titulo,
+			TiposExposicion.Descripcion,
+            ItinerarioExposicion.Horario
+			from 
+			lioness.Itinerario,
+			lioness.Exposicion,
+			lioness.TiposExposicion,
+			lioness.ItinerarioExposicion
+			where
+			Exposicion.ID=IDExposicion and 
+			TiposExposicion.ID=Exposicion.IDTipo and
+			ItinerarioExposicion.IDExposicion=Exposicion.ID and
+			ItinerarioExposicion.IDItinerario=IDItinerario and
+            ItinerarioExposicion.Horario=Horario;
+		else 
+			select 
+			Itinerario.ID,
+			Itinerario.Dia,
+			Exposicion.ID,
+			Exposicion.Presentador,
+			Exposicion.Duracion,
+			Exposicion.Titulo,
+			TiposExposicion.Descripcion,
+            ItinerarioExposicion.Horario
+			from 
+			lioness.Itinerario,
+			lioness.Exposicion,
+			lioness.TiposExposicion,
+			lioness.ItinerarioExposicion
+			where
+			Exposicion.ID=IDExposicion and 
+			TiposExposicion.ID=Exposicion.IDTipo and
+			ItinerarioExposicion.IDExposicion=IDExposicion and
+			ItinerarioExposicion.IDItinerario=Itinerario.ID ;
+        end if;
+	elseif IDItinerario!=0 then
+		if Horario is not null then
+			select 
+			Itinerario.ID,
+			Itinerario.Dia,
+			Exposicion.ID,
+			Exposicion.Presentador,
+			Exposicion.Duracion,
+			Exposicion.Titulo,
+			TiposExposicion.Descripcion,
+            ItinerarioExposicion.Horario
+			from 
+			lioness.Itinerario,
+			lioness.Exposicion,
+			lioness.TiposExposicion,
+			lioness.ItinerarioExposicion
+			where
+			Itinerario.ID=IDItinerario and 
+			TiposExposicion.ID=Exposicion.IDTipo and
+			ItinerarioExposicion.IDExposicion=IDExposicion and
+			ItinerarioExposicion.IDItinerario=Itinerario.ID and
+            ItinerarioExposicion.Horario=Horario;
+		else 
+			select 
+			Itinerario.ID,
+			Itinerario.Dia,
+			Exposicion.ID,
+			Exposicion.Presentador,
+			Exposicion.Duracion,
+			Exposicion.Titulo,
+			TiposExposicion.Descripcion,
+            ItinerarioExposicion.Horario
+			from 
+			lioness.Itinerario,
+			lioness.Exposicion,
+			lioness.TiposExposicion,
+			lioness.ItinerarioExposicion
+			where
+			Itinerario.ID=IDItinerario and 
+			TiposExposicion.ID=Exposicion.IDTipo and
+			ItinerarioExposicion.IDExposicion=Exposicion.ID and
+			ItinerarioExposicion.IDItinerario=IDItinerario ;
+        end if;
+    else
+		if Horario is not null then
+			select 
+			Itinerario.ID,
+			Itinerario.Dia,
+			Exposicion.ID,
+			Exposicion.Presentador,
+			Exposicion.Duracion,
+			Exposicion.Titulo,
+			TiposExposicion.Descripcion,
+            ItinerarioExposicion.Horario
+			from 
+			lioness.Itinerario,
+			lioness.Exposicion,
+			lioness.TiposExposicion,
+			lioness.ItinerarioExposicion
+			where
+			TiposExposicion.ID=Exposicion.IDTipo and
+            ItinerarioExposicion.IDExposicion=Exposicion.ID and
+			ItinerarioExposicion.IDItinerario=Itinerario.ID and
+            ItinerarioExposicion.Horario=Horario;
+        else
+			select 
+			Itinerario.ID,
+			Itinerario.Dia,
+			Exposicion.ID,
+			Exposicion.Presentador,
+			Exposicion.Duracion,
+			Exposicion.Titulo,
+			TiposExposicion.Descripcion,
+            ItinerarioExposicion.Horario
+			from 
+			lioness.Itinerario,
+			lioness.Exposicion,
+			lioness.TiposExposicion,
+			lioness.ItinerarioExposicion
+			where
+			TiposExposicion.ID=Exposicion.IDTipo and
+            ItinerarioExposicion.IDExposicion=Exposicion.ID and
+			ItinerarioExposicion.IDItinerario=Itinerario.ID;
+		end if;
 	end if;
 END$$
 DELIMITER ;

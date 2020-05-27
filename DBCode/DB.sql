@@ -51,7 +51,7 @@ create table Sello(
 create table Libro(
     ID int primary key auto_increment not null,
     Precio float not null,
-    Titulo varchar(50) not null,
+    Titulo varchar(50) not null
   
 );
 
