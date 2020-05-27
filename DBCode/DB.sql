@@ -51,8 +51,8 @@ create table Sello(
 create table Libro(
     ID int primary key auto_increment not null,
     Precio float not null,
-    Titulo varchar(50) not null,
-  
+    Titulo varchar(50) not null
+
 );
 
 create table Sala(
@@ -97,20 +97,20 @@ create table EditorialLibro (
 );
 
 create table ItinerarioExposicion (
-    primary key (IDItinerario, IDExposicion),
-    IDItinerario int not null,
+    primary key (IDItenerario, IDExposicion),
+    IDItenerario int not null,
     IDExposicion int not null,
     Horario Time not null,
-    FOREIGN KEY (IDItinerario) REFERENCES Itinerario(ID) ON DELETE CASCADE,
+    FOREIGN KEY (IDItenerario) REFERENCES Itinerario(ID) ON DELETE CASCADE,
     FOREIGN KEY (IDExposicion) REFERENCES Exposicion(ID) ON DELETE CASCADE
 );
 
 create table ItinerarioTaller (
-    primary key (IDItinerario, IDTaller),
-    IDItinerario int not null,
+    primary key (IDItenerario, IDTaller),
+    IDItenerario int not null,
     IDTaller int not null,
     Horario Time not null,
-    FOREIGN KEY (IDItinerario) REFERENCES Itinerario(ID) ON DELETE CASCADE,
+    FOREIGN KEY (IDItenerario) REFERENCES Itinerario(ID) ON DELETE CASCADE,
     FOREIGN KEY (IDTaller) REFERENCES Taller(ID) ON DELETE CASCADE
 );
 

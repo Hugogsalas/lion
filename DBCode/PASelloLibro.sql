@@ -8,6 +8,8 @@ create procedure PASelloLibro(
 begin
 	if IDSello!=0 and IDLibro!=0 then
 		select 
+		sello.ID,
+		Libro.ID,
 		sello.Descripcion,
 		Libro.Titulo,
 		Libro.precio 
@@ -19,6 +21,8 @@ begin
         sellolibro.IDLibro=IDLibro;
 	elseif IDSello!=0 then
 		select 
+		sello.ID,
+		Libro.ID,
         sello.Descripcion,
 		Libro.Titulo,
 		Libro.precio 
@@ -29,6 +33,8 @@ begin
         AutorLibro.IDSello=IDSello;
     else 
 		select 
+		sello.ID,
+		Libro.ID,
 		sello.Descripcion,
 		Libro.Titulo,
 		Libro.precio 

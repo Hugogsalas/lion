@@ -6,6 +6,8 @@ create procedure PAEditorialLibro(
 begin
 	if IDEditorial!=0 and IDLibro!=0 then
 		select 
+		Libro.ID,
+		editorial.ID,
 		editorial.Nombre,
 		Libro.Titulo,
 		Libro.precio 
@@ -17,6 +19,8 @@ begin
         editoriallibro.IDLibro=IDLibro;
 	elseif IDEditorial!=0 then
 		select 
+		Libro.ID,
+		editorial.ID,
         editorial.Nombre,
 		Libro.Titulo,
 		Libro.precio 
@@ -27,6 +31,8 @@ begin
         editoriallibro.IDEditorial=IDEditorial;
     else 
 		select 
+		Libro.ID,
+		editorial.ID,
 		editorial.Nombre,
 		Libro.Titulo,
 		Libro.precio 
