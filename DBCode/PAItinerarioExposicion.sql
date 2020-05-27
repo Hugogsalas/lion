@@ -1,19 +1,17 @@
 
 DELIMITER $$
-create procedure PAAutorLibro(
-	in IDAutor int,
-    in IDLibro int
+create procedure PAItinerarioExposicion(
+	in IDItinerario int,
+    in IDExposicion int
 )
 begin
-	if IDAutor!=0 and IDLibro!=0 then
+	if IDItinerario!=0 and IDExposicion!=0 then
 		select 
-		Autor.ID,
-		Autor.Nombre,
-		Autor.ApellidoPaterno,
-		Autor.ApellidoMaterno,
+		Itinerario.ID,
+		Itinerario.ApellidoPaterno,
 		Libro.Titulo,
 		Libro.precio 
-		from lioness.Autor,lioness.libro,lioness.AutorLibro
+		from lioness.Itinerario,lioness.libro,lioness.AutorLibro
 		where
         Autor.ID=IDAutor and 
         Libro.ID=IDLibro and 
@@ -21,7 +19,6 @@ begin
         AutorLibro.IDLibro=IDLibro;
 	elseif IDAutor!=0 then
 		select 
-		Autor.ID,
 		Autor.Nombre,
 		Autor.ApellidoPaterno,
 		Autor.ApellidoMaterno,
@@ -34,7 +31,6 @@ begin
         AutorLibro.IDAutor=IDAutor;
     else 
 		select 
-		Autor.ID,
 		Autor.Nombre,
 		Autor.ApellidoPaterno,
 		Autor.ApellidoMaterno,
