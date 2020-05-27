@@ -96,20 +96,20 @@ create table EditorialLibro (
 );
 
 create table ItinerarioExposicion (
-    primary key (IDItenerario, IDExposicion),
-    IDItenerario int not null,
+    primary key (IDItinerario, IDExposicion),
+    IDItinerario int not null,
     IDExposicion int not null,
     Horario Time not null,
-    FOREIGN KEY (IDItenerario) REFERENCES Itinerario(ID) ON DELETE CASCADE,
+    FOREIGN KEY (IDItinerario) REFERENCES Itinerario(ID) ON DELETE CASCADE,
     FOREIGN KEY (IDExposicion) REFERENCES Exposicion(ID) ON DELETE CASCADE
 );
 
 create table ItinerarioTaller (
-    primary key (IDItenerario, IDTaller),
-    IDItenerario int not null,
+    primary key (IDItinerario, IDTaller),
+    IDItinerario int not null,
     IDTaller int not null,
     Horario Time not null,
-    FOREIGN KEY (IDItenerario) REFERENCES Itinerario(ID) ON DELETE CASCADE,
+    FOREIGN KEY (IDItinerario) REFERENCES Itinerario(ID) ON DELETE CASCADE,
     FOREIGN KEY (IDTaller) REFERENCES Taller(ID) ON DELETE CASCADE
 );
 

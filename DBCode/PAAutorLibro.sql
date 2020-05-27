@@ -11,7 +11,7 @@ begin
 		Autor.Nombre,
 		Autor.ApellidoPaterno,
 		Autor.ApellidoMaterno,
-		Libro.ID
+		Libro.ID,
 		Libro.Titulo,
 		Libro.precio 
 		from lioness.Autor,lioness.libro,lioness.AutorLibro
@@ -26,7 +26,7 @@ begin
 		Autor.Nombre,
 		Autor.ApellidoPaterno,
 		Autor.ApellidoMaterno,
-		Libro.ID
+		Libro.ID,
 		Libro.Titulo,
 		Libro.precio 
 		from lioness.Autor,lioness.libro,lioness.AutorLibro
