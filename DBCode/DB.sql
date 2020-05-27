@@ -75,6 +75,7 @@ create table Taller(
     ID int primary key auto_increment not null,
     Nombre varchar(20) not null,
     Enfoque varchar(20) not null,
+    Duracion int not null,
     IDTipo int not null,
     FOREIGN KEY (IDTipo) REFERENCES TiposTalleres(ID) ON DELETE CASCADE
 );
