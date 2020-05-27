@@ -56,16 +56,16 @@ func GetAutorLibro(writter http.ResponseWriter, request *http.Request) {
 	jsonResponse := simplejson.New()
 
 	if err == nil {
-		
-		AutorLibroRows, err := utilities.CallStorageProcedure("PAAutorLibro",[]interface{}{AutorLibro.IDAutor,AutorLibro.IDLibro})
+
+		AutorLibroRows, err := utilities.CallStorageProcedure("PAAutorLibro", []interface{}{AutorLibro.IDAutor, AutorLibro.IDLibro})
 		if err == nil {
-			AutorLibroResultado, err := QueryToAutorLibro(AutorLibroRows)
-			
-			/*if AutorLibroValues[0]==nil{
-				AutorLibroResponse,err := GetRelations(AutorLibroResultado)
-			}else{
-				
-			}*/
+			var AutorLibroResultado []map[string]interface{}
+
+			if AutorLibro.IDAutor == 0 {
+				AutorLibroResultado, err = LibrosWithAutores(AutorLibroRows)
+			} else {
+				AutorLibroResultado, err = AutoresWithLibros(AutorLibroRows)
+			}
 
 			if err == nil {
 				if len(AutorLibroResultado) > 0 {
@@ -97,54 +97,102 @@ func GetAutorLibro(writter http.ResponseWriter, request *http.Request) {
 	return
 }
 
-//QueryToAutorLibro : metodo que combierte una consulta a una relacion autor-libro
-func QueryToAutorLibro(result *sql.Rows) ([]models.AutorLibro, error) {
-	var ΑutorLibroAux models.AutorLibro
-	var recipents []models.AutorLibro
+//LibrosWithAutores : metodo que combierte una consulta a una relacion Libro con autores descritos
+func LibrosWithAutores(result *sql.Rows) ([]map[string]interface{}, error) {
+	var LibroAux models.Libro
+	var AutorAux models.Autor
+	var Libros []models.Libro
+	var response []map[string]interface{}
 	for result.Next() {
-		err := result.Scan(&ΑutorLibroAux.IDAutor, &ΑutorLibroAux.IDLibro)
+		err := result.Scan(
+			&AutorAux.ID,
+			&AutorAux.Nombre,
+			&AutorAux.ApellidoPaterno,
+			&AutorAux.ApellidoMaterno,
+			&LibroAux.ID,
+			&LibroAux.Titulo,
+			&LibroAux.Precio)
+
 		if err != nil {
 			return nil, err
 		}
-		recipents = append(recipents, ΑutorLibroAux)
-	}
-	return recipents, nil
-}
-
-//GetRelations : metodo que trae los autores y libros relacionados
-/*func GetRelations(relations []models.AutorLibro) ([]map[string]interface{}, error) {
-	var relationsParse []map[string]interface{}
-	var newRelation map[string]interface{}
-	var idsAutorEncontrados []interface{}
-	var idsLibrosEncontrados []interface{}
-	var Autores []models.Autor
-	var Libros []models.Libro
-	for i := 0; i < len(relations); i++ {
-		rel := relations[i]
-		indexAutor := utilities.Ιndexof(idsAutorEncontrados, rel.IDAutor)
-		if indexAutor == -1 {
-			searchAutor, err := utilities.GetObject("Autor", nil, []string{"ID"}, []interface{}{rel.IDAutor})
-			if err == nil {
-				newΑutor, err := QueryToAutor(searchAutor)
-				if err==nil{
-					Autores=append(Autores,newΑutor[0])
-					newRelation["Autor"]
-				}else{
-					return nil, err
-				}
-			} else {
-				return nil, err
+			
+		index:=utilities.Ιndexof(LibrosToInterfaces(Libros),LibroAux)
+		if index==-1{
+			Libros=append(Libros,LibroAux)
+			newLibroInfo:=map[string]interface{}{
+				"id":LibroAux.ID,
+				"titulo":LibroAux.Titulo,
+				"precio":LibroAux.Precio,
+				"Autores":[]models.Autor{AutorAux},
 			}
-		} else {
-
-		}
-		indexLibro := utilities.Ιndexof(idsLibrosEncontrados, rel.IDLibro)
-		if indexLibro == -1 {
-
-		} else {
-
+			response=append(response,newLibroInfo)
+		}else{
+			var lastAutors []models.Autor
+			lastAutors=response[index]["Autores"].([]models.Autor)
+			response[index]["Autores"]=append(lastAutors,AutorAux)
 		}
 	}
-	return relationsParse, nil
+	return response, nil
 }
-*/
+
+//AutoresWithLibros : metodo que combierte una consulta a una relacion Autor con libros descritos
+func AutoresWithLibros(result *sql.Rows) ([]map[string]interface{}, error) {
+	var LibroAux models.Libro
+	var AutorAux models.Autor
+	var Autores []models.Autor
+	var response []map[string]interface{}
+	for result.Next() {
+		err := result.Scan(
+			&AutorAux.ID,
+			&AutorAux.Nombre,
+			&AutorAux.ApellidoPaterno,
+			&AutorAux.ApellidoMaterno,
+			&LibroAux.ID,
+			&LibroAux.Titulo,
+			&LibroAux.Precio)
+		if err != nil {
+			return nil, err
+		}
+			
+		index:=utilities.Ιndexof(AutoresToInterfaces(Autores),AutorAux)
+		if index==-1{
+			Autores=append(Autores,AutorAux)
+			newAutorInfo:=map[string]interface{}{
+				"id":AutorAux.ID,
+				"nombre":AutorAux.Nombre,
+				"apellidoPaterno":AutorAux.ApellidoPaterno,
+				"apellidoMaterno":AutorAux.ApellidoMaterno,
+				"Libros":[]models.Libro{LibroAux},
+			}
+			response=append(response,newAutorInfo)
+		}else{
+			var lastLibros []models.Libro
+			lastLibros=response[index]["Libros"].([]models.Libro)
+			response[index]["Libros"]=append(lastLibros,LibroAux)
+		}
+	}
+	return response, nil
+}
+
+//LibrosToInterfaces : metodo que transforma un arreglo de libros en interfaces
+func LibrosToInterfaces(Libros []models.Libro) []interface{} {
+	var arrayInterface []interface{}
+	for i:=0;i<len(Libros);i++{
+		var libroInterface interface{}
+		libroInterface=Libros[i]
+		arrayInterface=append(arrayInterface,libroInterface)
+	}
+	return arrayInterface
+}
+
+//AutoresToInterfaces : metodo que transforma un arreglo de Autores en interfaces
+func AutoresToInterfaces(Autores []models.Autor) []interface{} {
+	var arrayInterface []interface{}
+	for i:=0;i<len(Autores);i++{
+		var autorInterface interface{}
+		autorInterface=Autores[i]
+		arrayInterface=append(arrayInterface,autorInterface)
+	}
+	return arrayInterface
+}
