@@ -123,3 +123,14 @@ func QueryToSello(result *sql.Rows) ([]models.Sello, error) {
 	}
 	return recipents, nil
 }
+
+//SellosToInterfaces : metodo que transforma un arreglo de Sellos en interfaces
+func SellosToInterfaces(Sellos []models.Sello) []interface{} {
+	var arrayInterface []interface{}
+	for i:=0;i<len(Sellos);i++{
+		var selloInterface interface{}
+		selloInterface=Sellos[i]
+		arrayInterface=append(arrayInterface,selloInterface)
+	}
+	return arrayInterface
+}

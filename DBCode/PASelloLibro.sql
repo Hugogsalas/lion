@@ -9,11 +9,14 @@ begin
 	if IDSello!=0 and IDLibro!=0 then
 		select 
 		sello.ID,
-		Libro.ID,
 		sello.Descripcion,
+		Libro.ID,
 		Libro.Titulo,
 		Libro.precio 
-		from lioness.sello,lioness.libro,lioness.sellolibro
+		from 
+        lioness.sello,
+        lioness.libro,
+        lioness.sellolibro
 		where
         sello.ID=IDSello and 
         Libro.ID=IDLibro and 
@@ -22,23 +25,29 @@ begin
 	elseif IDSello!=0 then
 		select 
 		sello.ID,
-		Libro.ID,
         sello.Descripcion,
+		Libro.ID,
 		Libro.Titulo,
 		Libro.precio 
-		from lioness.sello,lioness.libro,lioness.sellolibro
+		from 
+        lioness.sello,
+        lioness.libro,
+        lioness.sellolibro
 		where 
-        Autor.ID=IDSello and
+        sello.ID=IDSello and
         sellolibro.IDLibro=Libro.ID and
-        AutorLibro.IDSello=IDSello;
+        sellolibro.IDSello=IDSello;
     else 
 		select 
 		sello.ID,
-		Libro.ID,
 		sello.Descripcion,
+		Libro.ID,
 		Libro.Titulo,
 		Libro.precio 
-		from lioness.Sello,lioness.libro,lioness.sellolibro
+		from 
+        lioness.Sello,
+        lioness.libro,
+        lioness.sellolibro
 		where 
         Libro.ID=IDLibro and
         sellolibro.IDSello=sello.ID and

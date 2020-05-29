@@ -118,3 +118,14 @@ func QueryToLibro(result *sql.Rows) ([]models.Libro, error) {
 	}
 	return recipents, nil
 }
+
+//LibrosToInterfaces : metodo que transforma un arreglo de libros en interfaces
+func LibrosToInterfaces(Libros []models.Libro) []interface{} {
+	var arrayInterface []interface{}
+	for i:=0;i<len(Libros);i++{
+		var libroInterface interface{}
+		libroInterface=Libros[i]
+		arrayInterface=append(arrayInterface,libroInterface)
+	}
+	return arrayInterface
+}

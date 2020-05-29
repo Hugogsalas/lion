@@ -175,24 +175,5 @@ func AutoresWithLibros(result *sql.Rows) ([]map[string]interface{}, error) {
 	return response, nil
 }
 
-//LibrosToInterfaces : metodo que transforma un arreglo de libros en interfaces
-func LibrosToInterfaces(Libros []models.Libro) []interface{} {
-	var arrayInterface []interface{}
-	for i:=0;i<len(Libros);i++{
-		var libroInterface interface{}
-		libroInterface=Libros[i]
-		arrayInterface=append(arrayInterface,libroInterface)
-	}
-	return arrayInterface
-}
 
-//AutoresToInterfaces : metodo que transforma un arreglo de Autores en interfaces
-func AutoresToInterfaces(Autores []models.Autor) []interface{} {
-	var arrayInterface []interface{}
-	for i:=0;i<len(Autores);i++{
-		var autorInterface interface{}
-		autorInterface=Autores[i]
-		arrayInterface=append(arrayInterface,autorInterface)
-	}
-	return arrayInterface
-}
+

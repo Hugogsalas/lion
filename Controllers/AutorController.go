@@ -118,3 +118,14 @@ func QueryToAutor(result *sql.Rows) ([]models.Autor, error) {
 	}
 	return recipents, nil
 }
+
+//AutoresToInterfaces : metodo que transforma un arreglo de Autores en interfaces
+func AutoresToInterfaces(Autores []models.Autor) []interface{} {
+	var arrayInterface []interface{}
+	for i:=0;i<len(Autores);i++{
+		var autorInterface interface{}
+		autorInterface=Autores[i]
+		arrayInterface=append(arrayInterface,autorInterface)
+	}
+	return arrayInterface
+}

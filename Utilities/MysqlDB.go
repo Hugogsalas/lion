@@ -100,21 +100,23 @@ func GetObject(table []string, selects []string, params []string, values []inter
 
 	command += " FROM "
 	for i := 0; i < len(table); i++ {
-		if values[i] != nil {
-			if i == (len(selects) - 1) {
-				command += table[i] + ","
-			} else {
-				command += table[i]
-			}
+		if i == (len(selects) - 1) {
+			command += table[i] + ","
+		} else {
+			command += table[i]
 		}
 	}
 
-	command += " WHERE "
+	where:=false
 
 	multiple := false
 
 	for i := 0; i < len(values); i++ {
 		if values[i] != nil {
+			if where==false{
+				command+=" WHERE "
+				where=true
+			}
 			if multiple {
 				command += " AND "
 			}
@@ -128,6 +130,7 @@ func GetObject(table []string, selects []string, params []string, values []inter
 			multiple = true
 		}
 	}
+	fmt.Println(command)
 	result, err := ExecuteQuery(command)
 
 	if err != nil {
@@ -149,7 +152,7 @@ func CallStorageProcedure(Name string, Values []interface{}) (*sql.Rows, error) 
 		} else {
 			command += varString
 		}
-		if i!=(len(Values)-1){
+		if i != (len(Values) - 1) {
 			command += ","
 		}
 	}
@@ -157,8 +160,6 @@ func CallStorageProcedure(Name string, Values []interface{}) (*sql.Rows, error) 
 	command += ")"
 
 	result, err := ExecuteQuery(command)
-
-	fmt.Println(command)
 
 	if err != nil {
 		return nil, err

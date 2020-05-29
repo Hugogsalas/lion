@@ -49,5 +49,5 @@ begin
         AutorLibro.IDAutor=Autor.ID and
         AutorLibro.IDLibro=IDLibro;
 	end if;
-END$$
-DELIMITER ;
+END
+$$DELIMITER ;

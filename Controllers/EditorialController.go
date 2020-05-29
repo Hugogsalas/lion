@@ -119,3 +119,14 @@ func QueryToEditorial(result *sql.Rows) ([]models.Editorial, error) {
 	}
 	return recipents, nil
 }
+
+//EditorialesToInterfaces : metodo que transforma un arreglo de Editoriales en interfaces
+func EditorialesToInterfaces(Editoriales []models.Editorial) []interface{} {
+	var arrayInterface []interface{}
+	for i:=0;i<len(Editoriales);i++{
+		var editorialInterface interface{}
+		editorialInterface=Editoriales[i]
+		arrayInterface=append(arrayInterface,editorialInterface)
+	}
+	return arrayInterface
+}

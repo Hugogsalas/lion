@@ -7,11 +7,14 @@ begin
 	if IDEditorial!=0 and IDLibro!=0 then
 		select 
 		Libro.ID,
-		editorial.ID,
-		editorial.Nombre,
 		Libro.Titulo,
-		Libro.precio 
-		from lioness.editorial,lioness.libro,lioness.editoriallibro
+		Libro.precio,
+        editorial.ID,
+		editorial.Nombre
+		from 
+		lioness.editorial,
+		lioness.libro,
+		lioness.editoriallibro
 		where
         editorial.ID=IDEditorial and 
         Libro.ID=IDLibro and 
@@ -20,11 +23,14 @@ begin
 	elseif IDEditorial!=0 then
 		select 
 		Libro.ID,
-		editorial.ID,
-        editorial.Nombre,
 		Libro.Titulo,
-		Libro.precio 
-		from lioness.editorial,lioness.libro,lioness.editoriallibro
+		Libro.precio,
+        editorial.ID,
+		editorial.Nombre
+		from 
+		lioness.editorial,
+		lioness.libro,
+		lioness.editoriallibro
 		where 
         editorial.ID=IDEditorial and
         editoriallibro.IDLibro=Libro.ID and
@@ -32,11 +38,14 @@ begin
     else 
 		select 
 		Libro.ID,
-		editorial.ID,
-		editorial.Nombre,
 		Libro.Titulo,
-		Libro.precio 
-		from lioness.editorial,lioness.libro,lioness.editoriallibro
+		Libro.precio,
+        editorial.ID,
+		editorial.Nombre
+		from 
+		lioness.editorial,
+		lioness.libro,
+		lioness.editoriallibro
 		where 
         Libro.ID=IDLibro and
         editoriallibro.IDEditorial=editorial.ID and

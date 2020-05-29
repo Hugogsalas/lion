@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"../Controllers"
 	"github.com/gorilla/mux"
+	"github.com/gorilla/handlers"
 )
 
 func main() {
@@ -35,7 +36,14 @@ func main() {
 	router.HandleFunc("/AutorLibro/create", controllers.CreateAutorLibro).Methods("POST")
 	router.HandleFunc("/AutorLibro/get", controllers.GetAutorLibro).Methods("POST")
 	router.HandleFunc("/EditorialLibro/create", controllers.CreateEditorialLibro).Methods("POST")
+	router.HandleFunc("/EditorialLibro/get", controllers.GetEditorialLibro).Methods("POST")
 	router.HandleFunc("/SelloLibro/create", controllers.CreateSelloLibro).Methods("POST")
+	router.HandleFunc("/SelloLibro/get", controllers.GetSelloLibro).Methods("POST")
 
-	log.Fatal(http.ListenAndServe(":8080", router))
+	log.Fatal(http.ListenAndServe(
+		":8080", 
+		handlers.CORS(
+			handlers.AllowedHeaders([]string{"X-Requested-With", "Content-Type", "Authorization"}),
+			handlers.AllowedMethods([]string{"GET", "POST", "PUT", "HEAD", "OPTIONS"}),
+			handlers.AllowedOrigins([]string{"*"}))(router)))
 }
