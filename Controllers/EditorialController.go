@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"encoding/json"
 	"net/http"
-	"fmt"
 	
 	"github.com/bitly/go-simplejson"
 
@@ -63,8 +62,6 @@ func GetEditorial(writter http.ResponseWriter, request *http.Request) {
 		editorialValues = utilities.ObjectValues(Editorial)
 		editorialStrings = utilities.ObjectFields(Editorial)
 
-		fmt.Println(editorialStrings)
-		fmt.Println(editorialValues)
 		//Limpia de los atributos del objeto
 		if editorialValues[0] == 0 {
 			editorialValues[0] = nil
@@ -76,7 +73,7 @@ func GetEditorial(writter http.ResponseWriter, request *http.Request) {
 			}
 		}
 
-		editorialRows, err := utilities.GetObject("Editorial", nil, editorialStrings, editorialValues)
+		editorialRows, err := utilities.GetObject([]string{"Editorial"}, nil, editorialStrings, editorialValues)
 		if err == nil {
 			editorialResultado, err := QueryToEditorial(editorialRows)
 			if err == nil {
@@ -121,4 +118,15 @@ func QueryToEditorial(result *sql.Rows) ([]models.Editorial, error) {
 		recipents = append(recipents, editorialAux)
 	}
 	return recipents, nil
+}
+
+//EditorialesToInterfaces : metodo que transforma un arreglo de Editoriales en interfaces
+func EditorialesToInterfaces(Editoriales []models.Editorial) []interface{} {
+	var arrayInterface []interface{}
+	for i:=0;i<len(Editoriales);i++{
+		var editorialInterface interface{}
+		editorialInterface=Editoriales[i]
+		arrayInterface=append(arrayInterface,editorialInterface)
+	}
+	return arrayInterface
 }

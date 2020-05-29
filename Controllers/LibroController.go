@@ -3,16 +3,15 @@ package controllers
 import (
 	"database/sql"
 	"encoding/json"
-	"fmt"
 	"net/http"
-	
+
 	"github.com/bitly/go-simplejson"
 
 	models "../Models"
 	utilities "../Utilities"
 )
 
- //CreateLibro : Metodo de insercion de un nuevo Libro                                                    
+//CreateLibro : Metodo de insercion de un nuevo Libro
 func CreateLibro(writter http.ResponseWriter, request *http.Request) {
 	var libro models.Libro
 	err := json.NewDecoder(request.Body).Decode(&libro)
@@ -49,9 +48,8 @@ func CreateLibro(writter http.ResponseWriter, request *http.Request) {
 	return
 }
 
-
-//GetLib : Metodo que regresa libros segun parametros
-func GetLib(writter http.ResponseWriter, request *http.Request) {
+//GetLibro : Metodo que regresa libros segun parametros
+func GetLibro(writter http.ResponseWriter, request *http.Request) {
 	var libro models.Libro
 	err := json.NewDecoder(request.Body).Decode(&libro)
 	jsonResponse := simplejson.New()
@@ -62,27 +60,21 @@ func GetLib(writter http.ResponseWriter, request *http.Request) {
 		libValues = utilities.ObjectValues(libro)
 		libStrings = utilities.ObjectFields(libro)
 
-		fmt.Println(libStrings)
-		fmt.Println(libValues)
-
 		//Limpia de los atributos del objeto
-		for i := 0; i < 2; i++ {
-			if libValues[i] == 0{
-				libValues[i] = nil
-			}
+		if libValues[0] == 0 {
+			libValues[0] = nil
 		}
-		if libValues[2]==0.0{
-			libValues[2]=nil
+		if libValues[1] == 0.0 {
+			libValues[1] = nil
 		}
-		if libValues[3] == "" {
-			libValues[3] = nil
+		if libValues[2] == "" {
+			libValues[2] = nil
 		}
 
-
-		libRows, err := utilities.GetObject("Libro", nil, libStrings, libValues)
+		libRows, err := utilities.GetObject([]string{"Libro"}, nil, libStrings, libValues)
 		if err == nil {
 			librosResultado, err := QueryToLibro(libRows)
-			fmt.Println(librosResultado)
+			
 			if err == nil {
 				if len(librosResultado) > 0 {
 					jsonResponse.Set("Exito", true)
@@ -118,11 +110,22 @@ func QueryToLibro(result *sql.Rows) ([]models.Libro, error) {
 	var libroAux models.Libro
 	var recipents []models.Libro
 	for result.Next() {
-		err := result.Scan(&libroAux.ID, &libroAux.IDAutor, &libroAux.Precio, &libroAux.Titulo)
+		err := result.Scan(&libroAux.ID, &libroAux.Precio, &libroAux.Titulo)
 		if err != nil {
 			return nil, err
 		}
 		recipents = append(recipents, libroAux)
 	}
 	return recipents, nil
+}
+
+//LibrosToInterfaces : metodo que transforma un arreglo de libros en interfaces
+func LibrosToInterfaces(Libros []models.Libro) []interface{} {
+	var arrayInterface []interface{}
+	for i:=0;i<len(Libros);i++{
+		var libroInterface interface{}
+		libroInterface=Libros[i]
+		arrayInterface=append(arrayInterface,libroInterface)
+	}
+	return arrayInterface
 }

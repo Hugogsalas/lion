@@ -3,7 +3,6 @@ package controllers
 import (
 	"database/sql"
 	"encoding/json"
-	"fmt"
 	"net/http"
 
 	"github.com/bitly/go-simplejson"
@@ -61,8 +60,7 @@ func GetAutor(writter http.ResponseWriter, request *http.Request) {
 		autorValues = utilities.ObjectValues(autor)
 		autorStrings = utilities.ObjectFields(autor)
 
-		fmt.Println(autorStrings)
-		fmt.Println(autorValues)
+
 		//Limpia de los atributos del objeto
 		if autorValues[0] == 0 {
 			autorValues[0] = nil
@@ -74,7 +72,7 @@ func GetAutor(writter http.ResponseWriter, request *http.Request) {
 			}
 		}
 
-		autorRows, err := utilities.GetObject("Autor", nil, autorStrings, autorValues)
+		autorRows, err := utilities.GetObject([]string{"Autor"}, nil, autorStrings, autorValues)
 		if err == nil {
 			autoresResultado, err := QueryToAutor(autorRows)
 			if err == nil {
@@ -119,4 +117,15 @@ func QueryToAutor(result *sql.Rows) ([]models.Autor, error) {
 		recipents = append(recipents, autorAux)
 	}
 	return recipents, nil
+}
+
+//AutoresToInterfaces : metodo que transforma un arreglo de Autores en interfaces
+func AutoresToInterfaces(Autores []models.Autor) []interface{} {
+	var arrayInterface []interface{}
+	for i:=0;i<len(Autores);i++{
+		var autorInterface interface{}
+		autorInterface=Autores[i]
+		arrayInterface=append(arrayInterface,autorInterface)
+	}
+	return arrayInterface
 }

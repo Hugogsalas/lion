@@ -9,7 +9,7 @@ import (
 
 //ExecuteCommand : Metodo de execucion de un query que no retorna nada
 func ExecuteCommand(command string) (interface{}, error) {
-	db, err := sql.Open("mysql", "root:emillie14@@tcp(127.0.0.1:3308)/lioness")
+	db, err := sql.Open("mysql", "root:ainerbds117@@tcp(127.0.0.1:3306)/lioness")
 	if err != nil {
 		return nil, err
 	}
@@ -23,7 +23,7 @@ func ExecuteCommand(command string) (interface{}, error) {
 
 //ExecuteQuery : Metodo de execucion de un query que retorna objetos
 func ExecuteQuery(command string) (*sql.Rows, error) {
-	db, err := sql.Open("mysql", "root:emillie14@@tcp(127.0.0.1:3308)/lioness")
+	db, err := sql.Open("mysql", "root:ainerbds117@@tcp(127.0.0.1:3306)/lioness")
 	if err != nil {
 		return nil, err
 	}
@@ -80,7 +80,7 @@ func InsertObject(table string, values []interface{}, fields []string) (bool, er
 }
 
 //GetObject : metodo que retorna un objeto segun parametros
-func GetObject(table string, selects []string, params []string, values []interface{}) (*sql.Rows,error) {
+func GetObject(table []string, selects []string, params []string, values []interface{}) (*sql.Rows, error) {
 	var command string
 
 	command += "SELECT "
@@ -98,13 +98,26 @@ func GetObject(table string, selects []string, params []string, values []interfa
 		}
 	}
 
-	command += " FROM " + table + " WHERE "
+	command += " FROM "
+	for i := 0; i < len(table); i++ {
+		if i == (len(selects) - 1) {
+			command += table[i] + ","
+		} else {
+			command += table[i]
+		}
+	}
 
-	multiple:=false
+	where:=false
+
+	multiple := false
 
 	for i := 0; i < len(values); i++ {
 		if values[i] != nil {
-			if multiple{
+			if where==false{
+				command+=" WHERE "
+				where=true
+			}
+			if multiple {
 				command += " AND "
 			}
 			var varType string = fmt.Sprintf("%T", values[i])
@@ -114,15 +127,44 @@ func GetObject(table string, selects []string, params []string, values []interfa
 			} else {
 				command += params[i] + "='" + varString + "'"
 			}
-			multiple=true
+			multiple = true
 		}
 	}
 	fmt.Println(command)
-	result,err:=ExecuteQuery(command)
+	result, err := ExecuteQuery(command)
 
-	if err!=nil{
-		return nil,err
+	if err != nil {
+		return nil, err
 	}
 
-	return result,nil
+	return result, nil
+}
+
+//CallStorageProcedure : funcion que lla a un procedimiento almacenado
+func CallStorageProcedure(Name string, Values []interface{}) (*sql.Rows, error) {
+	command := "call " + Name + "("
+
+	for i := 0; i < len(Values); i++ {
+		var varType string = fmt.Sprintf("%T", Values[i])
+		var varString string = fmt.Sprintf("%v", Values[i])
+		if varType == "string" {
+			command += "'" + varString + "'"
+		} else {
+			command += varString
+		}
+		if i != (len(Values) - 1) {
+			command += ","
+		}
+	}
+
+	command += ")"
+
+	result, err := ExecuteQuery(command)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return result, nil
+
 }

@@ -76,7 +76,7 @@ func LoginUser(writter http.ResponseWriter, request *http.Request) {
 				userValues = append(userValues, usuario.Correo)
 				userValues = append(userValues, usuario.Clave)
 
-				UserRow, err := utilities.GetObject("Usuarios", nil, userStrings, userValues)
+				UserRow, err := utilities.GetObject([]string{"Usuarios"}, nil, userStrings, userValues)
 
 				if err == nil {
 					UserList, err := QueryToUser(UserRow)

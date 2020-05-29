@@ -77,7 +77,7 @@ func GetSello(writter http.ResponseWriter, request *http.Request) {
 			}
 		}
 
-		selloRows, err := utilities.GetObject("Sello", nil, selloStrings, selloValues)
+		selloRows, err := utilities.GetObject([]string{"Sello"}, nil, selloStrings, selloValues)
 		if err == nil {
 			selloResultado, err := QueryToSello(selloRows)
 			if err == nil {
@@ -87,7 +87,7 @@ func GetSello(writter http.ResponseWriter, request *http.Request) {
 					jsonResponse.Set("Editorial", selloResultado)
 				} else {
 					jsonResponse.Set("Exito", false)
-					jsonResponse.Set("Message", "No se encontraron editoriales")
+					jsonResponse.Set("Message", "No se encontraron sellos")
 				}
 			} else {
 				jsonResponse.Set("Exito", false)
@@ -122,4 +122,15 @@ func QueryToSello(result *sql.Rows) ([]models.Sello, error) {
 		recipents = append(recipents, selloAux)
 	}
 	return recipents, nil
+}
+
+//SellosToInterfaces : metodo que transforma un arreglo de Sellos en interfaces
+func SellosToInterfaces(Sellos []models.Sello) []interface{} {
+	var arrayInterface []interface{}
+	for i:=0;i<len(Sellos);i++{
+		var selloInterface interface{}
+		selloInterface=Sellos[i]
+		arrayInterface=append(arrayInterface,selloInterface)
+	}
+	return arrayInterface
 }

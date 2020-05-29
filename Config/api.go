@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"../Controllers"
 	"github.com/gorilla/mux"
+	"github.com/gorilla/handlers"
 )
 
 func main() {
@@ -12,10 +13,11 @@ func main() {
 	router.HandleFunc("/User/create", controllers.CreateUser).Methods("POST")
 	router.HandleFunc("/User/login", controllers.LoginUser).Methods("POST")
 	router.HandleFunc("/Libro/create", controllers.CreateLibro).Methods("POST")
-	router.HandleFunc("/Libro/get", controllers.GetLib).Methods("POST")
+	router.HandleFunc("/Libro/get", controllers.GetLibro).Methods("POST")
 	router.HandleFunc("/Editorial/create", controllers.CreateEditorial).Methods("POST")
 	router.HandleFunc("/Editorial/get", controllers.GetEditorial).Methods("POST")
 	router.HandleFunc("/Exposicion/create", controllers.CreateExposicion).Methods("POST")
+	router.HandleFunc("/Exposicion/get", controllers.GetExposicion).Methods("POST")
 	router.HandleFunc("/TipoTaller/create", controllers.CreateTipoTaller).Methods("POST")
 	router.HandleFunc("/TipoExposicion/create", controllers.CreateTipoExposicion).Methods("POST")
 	router.HandleFunc("/Sello/create", controllers.CreateSello).Methods("POST")
@@ -28,11 +30,20 @@ func main() {
 	router.HandleFunc("/Autor/create", controllers.CreateAutor).Methods("POST")
 	router.HandleFunc("/Autor/get", controllers.GetAutor).Methods("POST")
 	router.HandleFunc("/Itinerario/create", controllers.CreateItinerario).Methods("POST")
+	router.HandleFunc("/Itinerario/get", controllers.GetItinerario).Methods("POST")
 	router.HandleFunc("/ItinerarioExposicion/create", controllers.CreateItinerarioExposicion).Methods("POST")
 	router.HandleFunc("/ItinerarioTaller/create", controllers.CreateItinerarioTaller).Methods("POST")
 	router.HandleFunc("/AutorLibro/create", controllers.CreateAutorLibro).Methods("POST")
+	router.HandleFunc("/AutorLibro/get", controllers.GetAutorLibro).Methods("POST")
 	router.HandleFunc("/EditorialLibro/create", controllers.CreateEditorialLibro).Methods("POST")
+	router.HandleFunc("/EditorialLibro/get", controllers.GetEditorialLibro).Methods("POST")
 	router.HandleFunc("/SelloLibro/create", controllers.CreateSelloLibro).Methods("POST")
+	router.HandleFunc("/SelloLibro/get", controllers.GetSelloLibro).Methods("POST")
 
-	log.Fatal(http.ListenAndServe(":8080", router))
+	log.Fatal(http.ListenAndServe(
+		":8080", 
+		handlers.CORS(
+			handlers.AllowedHeaders([]string{"X-Requested-With", "Content-Type", "Authorization"}),
+			handlers.AllowedMethods([]string{"GET", "POST", "PUT", "HEAD", "OPTIONS"}),
+			handlers.AllowedOrigins([]string{"*"}))(router)))
 }
