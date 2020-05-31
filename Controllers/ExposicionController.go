@@ -2,8 +2,8 @@ package controllers
 
 import (
 	"database/sql"
-	"encoding/json"
 	"fmt"
+	"encoding/json"
 	"net/http"
 
 	"github.com/bitly/go-simplejson"
@@ -11,6 +11,8 @@ import (
 	models "../Models"
 	utilities "../Utilities"
 )
+
+
 
 //CreateExposicion : Metodo de insercion de una nueva Exposicion
 func CreateExposicion(writter http.ResponseWriter, request *http.Request) {
