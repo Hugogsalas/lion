@@ -1,9 +1,9 @@
 package controllers
 
 import (
+	"database/sql"
 	"encoding/json"
 	"net/http"
-	"database/sql"
 
 	"github.com/bitly/go-simplejson"
 
@@ -14,7 +14,7 @@ import (
 //CreateSalaExposicion : Metodo de insercion de una nueva relacion Sala-Exposicion
 func CreateSalaExposicion(writter http.ResponseWriter, request *http.Request) {
 	var SalaExposicion models.SalaExposicion
-	
+
 	err := json.NewDecoder(request.Body).Decode(&SalaExposicion)
 
 	json := simplejson.New()
@@ -49,8 +49,6 @@ func CreateSalaExposicion(writter http.ResponseWriter, request *http.Request) {
 	return
 }
 
-
-
 //GetSalaExposicion : metodo que retorna  una relacion Sala-Exposicion
 func GetSalaExposicion(writter http.ResponseWriter, request *http.Request) {
 	var SalaExposicion models.SalaExposicion
@@ -72,7 +70,7 @@ func GetSalaExposicion(writter http.ResponseWriter, request *http.Request) {
 			if err == nil {
 				if len(SalaExposicionResultado) > 0 {
 					jsonResponse.Set("Exito", true)
-					jsonResponse.Set("Message", "AutorExposicion encontrado")
+					jsonResponse.Set("Message", "ExposicionExposicion encontrado")
 					jsonResponse.Set("SalaExposicion", SalaExposicionResultado)
 				} else {
 					jsonResponse.Set("Exito", false)
@@ -102,36 +100,49 @@ func GetSalaExposicion(writter http.ResponseWriter, request *http.Request) {
 //SalaWithExposiciones : metodo que combierte una consulta a una relacion Sala con Exposiciones descritos
 func SalaWithExposiciones(result *sql.Rows) ([]map[string]interface{}, error) {
 	var ExposicionAux models.Exposicion
+	var tipoAux models.TiposExposicion
 	var SalaAux models.Sala
 	var Salas []models.Sala
 	var response []map[string]interface{}
 	for result.Next() {
 		err := result.Scan(
+			&SalaAux.ID,
+			&SalaAux.Nombre,
 			&ExposicionAux.ID,
 			&ExposicionAux.Presentador,
 			&ExposicionAux.Titulo,
 			&ExposicionAux.Duracion,
-			&SalaAux.ID,
-			&SalaAux.Nombre)
+			&tipoAux.Descripcion)
 
 		if err != nil {
 			return nil, err
 		}
-		
-			
-		index:=utilities.Ιndexof(SalasToInterfaces(Salas),SalaAux)
-		if index==-1{
-			Salas=append(Salas,SalaAux)
-			newExposicionInfo:=map[string]interface{}{
-				"id":SalaAux.ID,
-				"nombre":SalaAux.Nombre,
-				"Exposiciones":[]models.Exposicion{ExposicionAux},
+
+		index := utilities.Ιndexof(SalasToInterfaces(Salas), SalaAux)
+		if index == -1 {
+			Salas = append(Salas, SalaAux)
+			newSalaInfo := map[string]interface{}{
+				"id":     SalaAux.ID,
+				"nombre": SalaAux.Nombre,
+				"Exposiciones": []map[string]interface{}{map[string]interface{}{
+					"id":          ExposicionAux.ID,
+					"duracion":    ExposicionAux.Duracion,
+					"descripcion": tipoAux.Descripcion,
+					"titulo":      ExposicionAux.Titulo,
+					"presentador": ExposicionAux.Presentador,
+				}},
 			}
-			response=append(response,newExposicionInfo)
-		}else{
-			var lastExposiciones []models.Exposicion
-			lastExposiciones=response[index]["Exposiciones"].([]models.Exposicion)
-			response[index]["Exposiciones"]=append(lastExposiciones,ExposicionAux)
+			response = append(response, newSalaInfo)
+		} else {
+			var lastExposiciones []map[string]interface{}
+			lastExposiciones = response[index]["Exposiciones"].([]map[string]interface{})
+			response[index]["Exposiciones"] = append(lastExposiciones,map[string]interface{}{
+				"id":          ExposicionAux.ID,
+				"duracion":    ExposicionAux.Duracion,
+				"descripcion": tipoAux.Descripcion,
+				"titulo":      ExposicionAux.Titulo,
+				"presentador": ExposicionAux.Presentador,
+			})
 		}
 	}
 	return response, nil
@@ -140,36 +151,39 @@ func SalaWithExposiciones(result *sql.Rows) ([]map[string]interface{}, error) {
 //ExposicionesWithSala : metodo que combierte una consulta a una relacion libors con Salas descritos
 func ExposicionesWithSala(result *sql.Rows) ([]map[string]interface{}, error) {
 	var ExposicionAux models.Exposicion
+	var tipoAux models.TiposExposicion
 	var SalaAux models.Sala
 	var Exposiciones []models.Exposicion
 	var response []map[string]interface{}
 	for result.Next() {
 		err := result.Scan(
+			&SalaAux.ID,
+			&SalaAux.Nombre,
 			&ExposicionAux.ID,
 			&ExposicionAux.Presentador,
 			&ExposicionAux.Titulo,
 			&ExposicionAux.Duracion,
-			&SalaAux.ID,
-			&SalaAux.Nombre)
+			&tipoAux.Descripcion)
 		if err != nil {
 			return nil, err
 		}
-			
-		index:=utilities.Ιndexof(ExposicionesToInterfaces(Exposiciones),ExposicionAux)
-		if index==-1{
-			Exposiciones=append(Exposiciones,ExposicionAux)
-			newAutorInfo:=map[string]interface{}{
-				"id":ExposicionAux.ID,
-				"Duracion":ExposicionAux.Duracion,
-				"Titulo":ExposicionAux.Titulo,
-				"Presentador":ExposicionAux.Presentador,
-				"Salas":[]models.Sala{SalaAux},
+
+		index := utilities.Ιndexof(ExposicionToInterfaces(Exposiciones), ExposicionAux)
+		if index == -1 {
+			Exposiciones = append(Exposiciones, ExposicionAux)
+			newExposicionInfo := map[string]interface{}{
+				"id":          ExposicionAux.ID,
+				"Duracion":    ExposicionAux.Duracion,
+				"Titulo":      ExposicionAux.Titulo,
+				"Presentador": ExposicionAux.Presentador,
+				"descripcion": tipoAux.Descripcion,
+				"Salas":       []models.Sala{SalaAux},
 			}
-			response=append(response,newAutorInfo)
-		}else{
+			response = append(response, newExposicionInfo)
+		} else {
 			var Salas []models.Sala
-			Salas=response[index]["Salas"].([]models.Sala)
-			response[index]["Salas"]=append(Salas,SalaAux)
+			Salas = response[index]["Salas"].([]models.Sala)
+			response[index]["Salas"] = append(Salas, SalaAux)
 		}
 	}
 	return response, nil
