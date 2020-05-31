@@ -123,3 +123,14 @@ func QueryToItinerario(result *sql.Rows) ([]models.Itinerario, error) {
 	}
 	return recipents, nil
 }
+
+//ItinerariosToInterfaces : metodo que transforma un arreglo de Itinerarios en interfaces
+func ItinerariosToInterfaces(Itinerarios []models.Itinerario) []interface{} {
+	var arrayInterface []interface{}
+	for i:=0;i<len(Itinerarios);i++{
+		var ExposicionInterface interface{}
+		ExposicionInterface=Itinerarios[i]
+		arrayInterface=append(arrayInterface,ExposicionInterface)
+	}
+	return arrayInterface
+}

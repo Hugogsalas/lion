@@ -57,7 +57,7 @@ func GetAutorLibro(writter http.ResponseWriter, request *http.Request) {
 
 	if err == nil {
 
-		AutorLibroRows, err := utilities.CallStorageProcedure("PAAutorLibro", []interface{}{AutorLibro.IDAutor, AutorLibro.IDLibro})
+		AutorLibroRows, err := utilities.CallStorageProcedure(" ", []interface{}{AutorLibro.IDAutor, AutorLibro.IDLibro})
 		if err == nil {
 			var AutorLibroResultado []map[string]interface{}
 
