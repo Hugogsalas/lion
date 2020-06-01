@@ -1,9 +1,9 @@
 package controllers
 
 import (
+	"database/sql"
 	"encoding/json"
 	"net/http"
-	"database/sql"
 
 	"github.com/bitly/go-simplejson"
 
@@ -63,16 +63,21 @@ func GetItinerarioExposicion(writter http.ResponseWriter, request *http.Request)
 		if err == nil {
 			var ItinerarioExposicionResultado []map[string]interface{}
 
-			if ItinerarioExposicion.IDItinerario == 0 && ItinerarioExposicion.IDItinerario == 0 {
-				if ItinerarioExposicion.Horario!="" {
-					ItinerarioExposicionResultado,err=HorariowithActvities(ItinerarioExposicionRows)
-				}
+			if ItinerarioExposicion.IDExposicion == 0 {
+
+				ItinerarioExposicionResultado, err = ItinerariowithExposicion(ItinerarioExposicionRows)
+
+			} else if ItinerarioExposicion.IDItinerario == 0 {
+
+				ItinerarioExposicionResultado, err = ExposicionWithItinerarios(ItinerarioExposicionRows)
+			} else {
+				ItinerarioExposicionResultado, err = ItinerariowithExposicion(ItinerarioExposicionRows)
 			}
 
 			if err == nil {
 				if len(ItinerarioExposicionResultado) > 0 {
 					jsonResponse.Set("Exito", true)
-					jsonResponse.Set("Message", "AutorLibro encontrado")
+					jsonResponse.Set("Message", "ItinerarioExposicion encontrado")
 					jsonResponse.Set("ItinerarioExposicion", ItinerarioExposicionResultado)
 				} else {
 					jsonResponse.Set("Exito", false)
@@ -99,9 +104,107 @@ func GetItinerarioExposicion(writter http.ResponseWriter, request *http.Request)
 	return
 }
 
-//HorariowithActvities : metodo que retorna una relacion Itinerario-Exposicion
-func HorariowithActvities(result *sql.Rows) ([]map[string]interface{},error){
+//ItinerariowithExposicion : metodo que retorna una relacion Itinerario-Exposicion
+func ItinerariowithExposicion(result *sql.Rows) ([]map[string]interface{}, error) {
+	var ExposicionAux models.Exposicion
+	var ItinerarioAux models.Itinerario
+	var tipoAux models.TiposExposicion
+	var Itinerarios []models.Itinerario
+	var ItinerarioExposcionAux models.ItinerarioExposicion
 	var response []map[string]interface{}
-	
+	for result.Next() {
+		err := result.Scan(
+			&ItinerarioAux.ID,
+			&ItinerarioAux.Dia,
+			&ExposicionAux.ID,
+			&ExposicionAux.Presentador,
+			&ExposicionAux.Duracion,
+			&ExposicionAux.Titulo,
+			&tipoAux.Descripcion,
+			&ItinerarioExposcionAux.Horario)
+		if err != nil {
+			return nil, err
+		}
+
+		index := utilities.Ιndexof(ItinerariosToInterfaces(Itinerarios), ItinerarioAux)
+		if index == -1 {
+			Itinerarios = append(Itinerarios, ItinerarioAux)
+			newAutorInfo := map[string]interface{}{
+				"id":  ItinerarioAux.ID,
+				"dia": ItinerarioAux.Dia,
+				"Exposiciones": []map[string]interface{}{map[string]interface{}{
+					"id":          ExposicionAux.ID,
+					"duracion":    ExposicionAux.Duracion,
+					"titulo":      ExposicionAux.Titulo,
+					"presentador": ExposicionAux.Presentador,
+					"descripcion": tipoAux.Descripcion,
+					"Horario":     ItinerarioExposcionAux.Horario,
+				}},
+			}
+			response = append(response, newAutorInfo)
+		} else {
+			var Exposiciones []map[string]interface{}
+			Exposiciones = response[index]["Exposiciones"].([]map[string]interface{})
+			response[index]["Exposiciones"] = append(Exposiciones, map[string]interface{}{
+				"id":          ExposicionAux.ID,
+				"duracion":    ExposicionAux.Duracion,
+				"titulo":      ExposicionAux.Titulo,
+				"presentador": ExposicionAux.Presentador,
+				"descripcion": tipoAux.Descripcion,
+				"Horario":     ItinerarioExposcionAux.Horario,
+			})
+		}
+	}
+	return response, nil
+}
+
+//ExposicionWithItinerarios : metodo que retorna una relacion Itinerario-Exposicion
+func ExposicionWithItinerarios(result *sql.Rows) ([]map[string]interface{}, error) {
+	var ExposicionAux models.Exposicion
+	var ItinerarioAux models.Itinerario
+	var tipoAux models.TiposExposicion
+	var Exposiciones []models.Exposicion
+	var ItinerarioExposcionAux models.ItinerarioExposicion
+	var response []map[string]interface{}
+	for result.Next() {
+		err := result.Scan(
+			&ItinerarioAux.ID,
+			&ItinerarioAux.Dia,
+			&ExposicionAux.ID,
+			&ExposicionAux.Presentador,
+			&ExposicionAux.Duracion,
+			&ExposicionAux.Titulo,
+			&tipoAux.Descripcion,
+			&ItinerarioExposcionAux.Horario)
+		if err != nil {
+			return nil, err
+		}
+
+		index := utilities.Ιndexof(ExposicionToInterfaces(Exposiciones), ExposicionAux)
+		if index == -1 {
+			Exposiciones = append(Exposiciones, ExposicionAux)
+			newExposicionInfo := map[string]interface{}{
+				"id":          ExposicionAux.ID,
+				"duracion":    ExposicionAux.Duracion,
+				"titulo":      ExposicionAux.Titulo,
+				"presentador": ExposicionAux.Presentador,
+				"descripcion": tipoAux.Descripcion,
+				"Itinerarios": []map[string]interface{}{map[string]interface{}{
+					"id":      ItinerarioAux.ID,
+					"dia":     ItinerarioAux.Dia,
+					"Horario": ItinerarioExposcionAux.Horario,
+				}},
+			}
+			response = append(response, newExposicionInfo)
+		} else {
+			var Itinerarios []map[string]interface{}
+			Itinerarios = response[index]["Itinerarios"].([]map[string]interface{})
+			response[index]["Itinerarios"] = append(Itinerarios, map[string]interface{}{
+				"id":      ItinerarioAux.ID,
+				"dia":     ItinerarioAux.Dia,
+				"Horario": ItinerarioExposcionAux.Horario,
+			})
+		}
+	}
 	return response, nil
 }
