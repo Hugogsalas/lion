@@ -148,12 +148,15 @@ func CallStorageProcedure(Name string, Values []interface{}) (*sql.Rows, error) 
 		var varString string = fmt.Sprintf("%v", Values[i])
 		if varType == "string" {
 			command += "'" + varString + "'"
+		}else if Values[i]==nil{
+			command += "null"
 		} else {
 			command += varString
 		}
 		if i != (len(Values) - 1) {
 			command += ","
 		}
+
 	}
 
 	command += ")"
