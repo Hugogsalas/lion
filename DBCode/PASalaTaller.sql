@@ -1,4 +1,5 @@
 
+
 DELIMITER $$
 create procedure PASalaTaller(
 	in IDSala int,
@@ -12,6 +13,7 @@ begin
         Taller.ID,
 		Taller.Nombre,
 		Taller.Enfoque,
+        Taller.Duracion,
         TiposTalleres.Descripcion
 		from 
         lioness.Taller,
@@ -31,6 +33,7 @@ begin
         Taller.ID,
 		Taller.Nombre,
 		Taller.Enfoque,
+        Taller.Duracion,
         TiposTalleres.Descripcion
 		from 
         lioness.Taller,
@@ -49,6 +52,7 @@ begin
         Taller.ID,
 		Taller.Nombre,
 		Taller.Enfoque,
+        Taller.Duracion,
         TiposTalleres.Descripcion
 		from 
         lioness.Taller,
