@@ -35,7 +35,7 @@ begin
         editorial.ID=IDEditorial and
         editoriallibro.IDLibro=Libro.ID and
         editoriallibro.IDEditorial=IDEditorial;
-    else 
+	elseif IDLibro!=0 then
 		select 
 		Libro.ID,
 		Libro.Titulo,
@@ -50,6 +50,20 @@ begin
         Libro.ID=IDLibro and
         editoriallibro.IDEditorial=editorial.ID and
         editoriallibro.IDLibro=IDLibro;
+    else 
+		select 
+		Libro.ID,
+		Libro.Titulo,
+		Libro.precio,
+        editorial.ID,
+		editorial.Nombre
+		from 
+		lioness.editorial,
+		lioness.libro,
+		lioness.editoriallibro
+		where 
+        editoriallibro.IDEditorial=editorial.ID and
+        editoriallibro.IDLibro=Libro.ID;
 	end if;
 END$$
 DELIMITER ;

@@ -1,4 +1,3 @@
-
 DELIMITER $$
 create procedure PAAutorLibro(
 	in IDAutor int,
@@ -34,7 +33,7 @@ begin
         Autor.ID=IDAutor and
         AutorLibro.IDLibro=Libro.ID and
         AutorLibro.IDAutor=IDAutor;
-    else 
+    elseif IDLibro!=0 then
 		select 
 		Autor.ID,
 		Autor.Nombre,
@@ -48,6 +47,19 @@ begin
         Libro.ID=IDLibro and
         AutorLibro.IDAutor=Autor.ID and
         AutorLibro.IDLibro=IDLibro;
+	else 
+		select 
+		Autor.ID,
+		Autor.Nombre,
+		Autor.ApellidoPaterno,
+		Autor.ApellidoMaterno,
+		Libro.ID,
+		Libro.Titulo,
+		Libro.precio 
+		from lioness.Autor,lioness.libro,lioness.AutorLibro
+		where 
+        AutorLibro.IDAutor=Autor.ID and
+        AutorLibro.IDLibro=Libro.ID;
 	end if;
-END
-$$DELIMITER ;
+END$$
+DELIMITER ;

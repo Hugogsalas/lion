@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"database/sql"
 
+	"github.com/mitchellh/mapstructure"
 	"github.com/bitly/go-simplejson"
 
 	models "../Models"
@@ -79,6 +80,70 @@ func GetEditorialLibro(writter http.ResponseWriter, request *http.Request) {
 			} else {
 				jsonResponse.Set("Exito", false)
 				jsonResponse.Set("Message", err.Error())
+			}
+
+		} else {
+			jsonResponse.Set("Exito", false)
+			jsonResponse.Set("Message", err.Error())
+		}
+
+	} else {
+		jsonResponse.Set("Exito", false)
+		jsonResponse.Set("Message", err.Error())
+	}
+
+	payload, err := jsonResponse.MarshalJSON()
+	writter.Header().Set("Content-Type", "application/json")
+	writter.Write(payload)
+	return
+}
+
+//UpdateEditorialLibro : Metodo que actualiza EditorialLibro segun parametros
+func UpdateEditorialLibro(writter http.ResponseWriter, request *http.Request) {
+	var lastEditorialLibro models.EditorialLibro
+	var newEditorialLibro models.EditorialLibro
+	var recipient map[string]interface{}
+	err := json.NewDecoder(request.Body).Decode(&recipient)
+	jsonResponse := simplejson.New()
+	if err == nil {
+
+		mapstructure.Decode(recipient["filter"], &lastEditorialLibro)
+		mapstructure.Decode(recipient["update"], &newEditorialLibro)
+
+		var EditorialLibroFiltersValues []interface{}
+		var EditorialLibroFilters []string
+
+		EditorialLibroFiltersValues =utilities.ObjectValues(lastEditorialLibro)
+		EditorialLibroFilters =utilities.ObjectFields(lastEditorialLibro)
+
+		var EditorialLibroValues []interface{}
+		var EditorialLibroStrings []string
+
+		EditorialLibroValues = utilities.ObjectValues(newEditorialLibro)
+		EditorialLibroStrings = utilities.ObjectFields(newEditorialLibro)
+
+		for i:=0;i<len(EditorialLibroValues);i++{
+			if EditorialLibroValues[i] == 0 {
+				EditorialLibroValues[i] = nil
+			}
+			if EditorialLibroFiltersValues[i] == 0 {
+				EditorialLibroFiltersValues[i] = nil
+			}
+		}
+
+		EditorialLibroRows, err := utilities.UpdateObject("EditorialLibro", EditorialLibroFilters, EditorialLibroFiltersValues, EditorialLibroStrings, EditorialLibroValues)
+		if err == nil {
+
+			if EditorialLibroRows {
+
+				jsonResponse.Set("Exito", true)
+				jsonResponse.Set("Message", "EditorialLibro actualizado")
+
+			} else {
+
+				jsonResponse.Set("Exito", false)
+				jsonResponse.Set("Message", err.Error())
+
 			}
 
 		} else {

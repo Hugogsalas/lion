@@ -79,10 +79,10 @@ func GetTiposTalleres(writter http.ResponseWriter, request *http.Request) {
 				if len(TiposTalleresesResultado) > 0 {
 					jsonResponse.Set("Exito", true)
 					jsonResponse.Set("Message", "TiposTallereses encontrados")
-					jsonResponse.Set("TiposTallereses", TiposTalleresesResultado)
+					jsonResponse.Set("TiposTalleres", TiposTalleresesResultado)
 				} else {
 					jsonResponse.Set("Exito", false)
-					jsonResponse.Set("Message", "No se encontraron TiposTallereses")
+					jsonResponse.Set("Message", "No se encontraron TiposTalleres")
 				}
 			} else {
 				jsonResponse.Set("Exito", false)

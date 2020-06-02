@@ -1,5 +1,3 @@
-
-
 DELIMITER $$
 create procedure PASelloLibro(
 	in IDSello int,
@@ -37,7 +35,7 @@ begin
         sello.ID=IDSello and
         sellolibro.IDLibro=Libro.ID and
         sellolibro.IDSello=IDSello;
-    else 
+    elseif IDLibro!=0 then
 		select 
 		sello.ID,
 		sello.Descripcion,
@@ -52,6 +50,20 @@ begin
         Libro.ID=IDLibro and
         sellolibro.IDSello=sello.ID and
         sellolibro.IDLibro=IDLibro;
+	else 
+		select 
+		sello.ID,
+		sello.Descripcion,
+		Libro.ID,
+		Libro.Titulo,
+		Libro.precio 
+		from 
+        lioness.Sello,
+        lioness.libro,
+        lioness.sellolibro
+		where 
+        sellolibro.IDSello=sello.ID and
+        sellolibro.IDLibro=Libro.ID;
 	end if;
 END$$
 DELIMITER ;

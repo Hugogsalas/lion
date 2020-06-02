@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/bitly/go-simplejson"
+	"github.com/mitchellh/mapstructure"
 
 	models "../Models"
 	utilities "../Utilities"
@@ -86,6 +87,76 @@ func GetItinerarioExposicion(writter http.ResponseWriter, request *http.Request)
 			} else {
 				jsonResponse.Set("Exito", false)
 				jsonResponse.Set("Message", err.Error())
+			}
+
+		} else {
+			jsonResponse.Set("Exito", false)
+			jsonResponse.Set("Message", err.Error())
+		}
+
+	} else {
+		jsonResponse.Set("Exito", false)
+		jsonResponse.Set("Message", err.Error())
+	}
+
+	payload, err := jsonResponse.MarshalJSON()
+	writter.Header().Set("Content-Type", "application/json")
+	writter.Write(payload)
+	return
+}
+
+//UpdateItinerarioExposicion : Metodo que actualiza ItinerarioExposicion segun parametros
+func UpdateItinerarioExposicion(writter http.ResponseWriter, request *http.Request) {
+	var lastItinerarioExposicion models.ItinerarioExposicion
+	var newItinerarioExposicion models.ItinerarioExposicion
+	var recipient map[string]interface{}
+	err := json.NewDecoder(request.Body).Decode(&recipient)
+	jsonResponse := simplejson.New()
+	if err == nil {
+
+		mapstructure.Decode(recipient["filter"], &lastItinerarioExposicion)
+		mapstructure.Decode(recipient["update"], &newItinerarioExposicion)
+
+		var ItinerarioExposicionFiltersValues []interface{}
+		var ItinerarioExposicionFilters []string
+
+		ItinerarioExposicionFiltersValues =utilities.ObjectValues(lastItinerarioExposicion)
+		ItinerarioExposicionFilters =utilities.ObjectFields(lastItinerarioExposicion)
+
+		var ItinerarioExposicionValues []interface{}
+		var ItinerarioExposicionStrings []string
+
+		ItinerarioExposicionValues = utilities.ObjectValues(newItinerarioExposicion)
+		ItinerarioExposicionStrings = utilities.ObjectFields(newItinerarioExposicion)
+
+		for i:=1;i<2;i++{
+			if ItinerarioExposicionValues[i] == 0 {
+				ItinerarioExposicionValues[i] = nil
+			}
+			if ItinerarioExposicionFiltersValues[i] == 0 {
+				ItinerarioExposicionFiltersValues[i] = nil
+			}
+		}
+		if ItinerarioExposicionValues[2] == "" {
+			ItinerarioExposicionValues[2] = nil
+		}
+		if ItinerarioExposicionFiltersValues[2] == "" {
+			ItinerarioExposicionFiltersValues[2] = nil
+		}
+
+		ItinerarioExposicionRows, err := utilities.UpdateObject("ItinerarioExposicion", ItinerarioExposicionFilters, ItinerarioExposicionFiltersValues, ItinerarioExposicionStrings, ItinerarioExposicionValues)
+		if err == nil {
+
+			if ItinerarioExposicionRows {
+
+				jsonResponse.Set("Exito", true)
+				jsonResponse.Set("Message", "ItinerarioExposicion actualizado")
+
+			} else {
+
+				jsonResponse.Set("Exito", false)
+				jsonResponse.Set("Message", err.Error())
+
 			}
 
 		} else {
