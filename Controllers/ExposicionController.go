@@ -2,8 +2,8 @@ package controllers
 
 import (
 	"database/sql"
-	"encoding/json"
 	"fmt"
+	"encoding/json"
 	"net/http"
 
 	"github.com/bitly/go-simplejson"
@@ -12,10 +12,12 @@ import (
 	utilities "../Utilities"
 )
 
+
+
 //CreateExposicion : Metodo de insercion de una nueva Exposicion
 func CreateExposicion(writter http.ResponseWriter, request *http.Request) {
 	var Exposicion models.Exposicion
-	
+
 	err := json.NewDecoder(request.Body).Decode(&Exposicion)
 
 	json := simplejson.New()
@@ -67,7 +69,7 @@ func GetExposicion(writter http.ResponseWriter, request *http.Request) {
 
 		//Limpia de los atributos del objeto
 		for i := 0; i < 3; i++ {
-			if expValues[i] == 0{
+			if expValues[i] == 0 {
 				expValues[i] = nil
 			}
 		}
@@ -77,8 +79,6 @@ func GetExposicion(writter http.ResponseWriter, request *http.Request) {
 				expValues[i] = nil
 			}
 		}
-	
-
 
 		expRows, err := utilities.GetObject([]string{"Exposicion"}, nil, expStrings, expValues)
 		if err == nil {
@@ -127,3 +127,15 @@ func QueryToExposicion(result *sql.Rows) ([]models.Exposicion, error) {
 	}
 	return recipents, nil
 }
+
+//ExposicionToInterfaces : metodo que transforma un arreglo de Exposicion en interfaces
+func ExposicionToInterfaces(Exposicion []models.Exposicion) []interface{} {
+	var arrayInterface []interface{}
+	for i := 0; i < len(Exposicion); i++ {
+		var ExposicionInterface interface{}
+		ExposicionInterface = Exposicion[i]
+		arrayInterface = append(arrayInterface, ExposicionInterface)
+	}
+	return arrayInterface
+}
+

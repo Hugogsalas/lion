@@ -118,12 +118,12 @@ func EditorialWithLibros(result *sql.Rows) ([]map[string]interface{}, error) {
 		index:=utilities.Ιndexof(EditorialesToInterfaces(Editoriales),EditorialAux)
 		if index==-1{
 			Editoriales=append(Editoriales,EditorialAux)
-			newLibroInfo:=map[string]interface{}{
+			newEditorialInfo:=map[string]interface{}{
 				"id":EditorialAux.ID,
 				"nombre":EditorialAux.Nombre,
 				"Libros":[]models.Libro{LibroAux},
 			}
-			response=append(response,newLibroInfo)
+			response=append(response,newEditorialInfo)
 		}else{
 			var lastLibros []models.Libro
 			lastLibros=response[index]["Libros"].([]models.Libro)
@@ -153,13 +153,13 @@ func LibrosWithEditorial(result *sql.Rows) ([]map[string]interface{}, error) {
 		index:=utilities.Ιndexof(LibrosToInterfaces(Libros),LibroAux)
 		if index==-1{
 			Libros=append(Libros,LibroAux)
-			newAutorInfo:=map[string]interface{}{
+			newLibroInfo:=map[string]interface{}{
 				"id":LibroAux.ID,
 				"titulo":LibroAux.Titulo,
 				"precio":LibroAux.Precio,
 				"Editoriales":[]models.Editorial{EditorialAux},
 			}
-			response=append(response,newAutorInfo)
+			response=append(response,newLibroInfo)
 		}else{
 			var Editoriales []models.Editorial
 			Editoriales=response[index]["Editoriales"].([]models.Editorial)
