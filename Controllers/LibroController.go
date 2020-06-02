@@ -105,6 +105,66 @@ func GetLibro(writter http.ResponseWriter, request *http.Request) {
 	return
 }
 
+//UpdateLibro : Metodo que actualiza Libros segun parametros
+func UpdateLibro(writter http.ResponseWriter, request *http.Request) {
+	var Libro models.Libro
+	err := json.NewDecoder(request.Body).Decode(&Libro)
+	jsonResponse := simplejson.New()
+	if err == nil {
+
+		var LibroFilters []string
+		var LibroFiltersValues []interface{}
+
+		LibroFilters = append(LibroFilters, "ID")
+		LibroFiltersValues = append(LibroFiltersValues, Libro.ID)
+
+		var LibroValues []interface{}
+		var LibroStrings []string
+
+		LibroValues = utilities.ObjectValues(Libro)
+		LibroStrings = utilities.ObjectFields(Libro)
+
+		LibroValues[0] = nil
+
+		if LibroValues[1] == 0.0 {
+			LibroValues[1] = nil
+		}
+		if LibroValues[2] == "" {
+			LibroValues[2] = nil
+		}
+		
+
+		LibroRows, err := utilities.UpdateObject("Libro", LibroFilters, LibroFiltersValues, LibroStrings, LibroValues)
+		if err == nil {
+
+			if LibroRows {
+
+				jsonResponse.Set("Exito", true)
+				jsonResponse.Set("Message", "Libro actualizado")
+
+			} else {
+
+				jsonResponse.Set("Exito", false)
+				jsonResponse.Set("Message", err.Error())
+				
+			}
+
+		} else {
+			jsonResponse.Set("Exito", false)
+			jsonResponse.Set("Message", err.Error())
+		}
+
+	} else {
+		jsonResponse.Set("Exito", false)
+		jsonResponse.Set("Message", err.Error())
+	}
+
+	payload, err := jsonResponse.MarshalJSON()
+	writter.Header().Set("Content-Type", "application/json")
+	writter.Write(payload)
+	return
+}
+
 //QueryToLibro : Metodo que transforma la consulta a objetos Libro
 func QueryToLibro(result *sql.Rows) ([]models.Libro, error) {
 	var libroAux models.Libro

@@ -105,6 +105,62 @@ func GetTiposTalleres(writter http.ResponseWriter, request *http.Request) {
 	return
 }
 
+//UpdateTiposTaller : Metodo que actualiza TiposTaller segun parametros
+func UpdateTiposTaller(writter http.ResponseWriter, request *http.Request) {
+	var TiposTaller models.TiposTalleres
+	err := json.NewDecoder(request.Body).Decode(&TiposTaller)
+	jsonResponse := simplejson.New()
+	if err == nil {
+
+		var TiposTallerFilters []string
+		var TiposTallerFiltersValues []interface{}
+
+		TiposTallerFilters = append(TiposTallerFilters, "ID")
+		TiposTallerFiltersValues = append(TiposTallerFiltersValues, TiposTaller.ID)
+
+		var TiposTallerValues []interface{}
+		var TiposTallerStrings []string
+
+		TiposTallerValues = utilities.ObjectValues(TiposTaller)
+		TiposTallerStrings = utilities.ObjectFields(TiposTaller)
+
+		TiposTallerValues[0] = nil
+
+		if TiposTallerValues[1] == "" {
+			TiposTallerValues[1] = nil
+		}
+
+		TiposTallerRows, err := utilities.UpdateObject("TiposTalleres", TiposTallerFilters, TiposTallerFiltersValues, TiposTallerStrings, TiposTallerValues)
+		if err == nil {
+
+			if TiposTallerRows {
+
+				jsonResponse.Set("Exito", true)
+				jsonResponse.Set("Message", "TiposTaller actualizado")
+
+			} else {
+
+				jsonResponse.Set("Exito", false)
+				jsonResponse.Set("Message", err.Error())
+
+			}
+
+		} else {
+			jsonResponse.Set("Exito", false)
+			jsonResponse.Set("Message", err.Error())
+		}
+
+	} else {
+		jsonResponse.Set("Exito", false)
+		jsonResponse.Set("Message", err.Error())
+	}
+
+	payload, err := jsonResponse.MarshalJSON()
+	writter.Header().Set("Content-Type", "application/json")
+	writter.Write(payload)
+	return
+}
+
 //QueryToTiposTalleres : Metodo que transforma la consulta a objetos TiposTalleres
 func QueryToTiposTalleres(result *sql.Rows) ([]models.TiposTalleres, error) {
 	var TiposTalleresAux models.TiposTalleres

@@ -60,7 +60,6 @@ func GetAutor(writter http.ResponseWriter, request *http.Request) {
 		autorValues = utilities.ObjectValues(autor)
 		autorStrings = utilities.ObjectFields(autor)
 
-
 		//Limpia de los atributos del objeto
 		if autorValues[0] == 0 {
 			autorValues[0] = nil
@@ -105,6 +104,64 @@ func GetAutor(writter http.ResponseWriter, request *http.Request) {
 	return
 }
 
+//UpdateAutor : Metodo que actualiza autores segun parametros
+func UpdateAutor(writter http.ResponseWriter, request *http.Request) {
+	var autor models.Autor
+	err := json.NewDecoder(request.Body).Decode(&autor)
+	jsonResponse := simplejson.New()
+	if err == nil {
+
+		var autorFilters []string
+		var autorFiltersValues []interface{}
+
+		autorFilters = append(autorFilters, "ID")
+		autorFiltersValues = append(autorFiltersValues, autor.ID)
+
+		var autorValues []interface{}
+		var autorStrings []string
+
+		autorValues = utilities.ObjectValues(autor)
+		autorStrings = utilities.ObjectFields(autor)
+
+		autorValues[0] = nil
+
+		for i := 1; i < len(autorStrings); i++ {
+			if autorValues[i] == "" {
+				autorValues[i] = nil
+			}
+		}
+
+		autorRows, err := utilities.UpdateObject("Autor", autorFilters, autorFiltersValues, autorStrings, autorValues)
+		if err == nil {
+
+			if autorRows {
+
+				jsonResponse.Set("Exito", true)
+				jsonResponse.Set("Message", "Autor actualizado")
+
+			} else {
+
+				jsonResponse.Set("Exito", false)
+				jsonResponse.Set("Message", err.Error())
+				
+			}
+
+		} else {
+			jsonResponse.Set("Exito", false)
+			jsonResponse.Set("Message", err.Error())
+		}
+
+	} else {
+		jsonResponse.Set("Exito", false)
+		jsonResponse.Set("Message", err.Error())
+	}
+
+	payload, err := jsonResponse.MarshalJSON()
+	writter.Header().Set("Content-Type", "application/json")
+	writter.Write(payload)
+	return
+}
+
 //QueryToAutor : Metodo que transforma la consulta a objetos Autor
 func QueryToAutor(result *sql.Rows) ([]models.Autor, error) {
 	var autorAux models.Autor
@@ -122,10 +179,10 @@ func QueryToAutor(result *sql.Rows) ([]models.Autor, error) {
 //AutoresToInterfaces : metodo que transforma un arreglo de Autores en interfaces
 func AutoresToInterfaces(Autores []models.Autor) []interface{} {
 	var arrayInterface []interface{}
-	for i:=0;i<len(Autores);i++{
+	for i := 0; i < len(Autores); i++ {
 		var autorInterface interface{}
-		autorInterface=Autores[i]
-		arrayInterface=append(arrayInterface,autorInterface)
+		autorInterface = Autores[i]
+		arrayInterface = append(arrayInterface, autorInterface)
 	}
 	return arrayInterface
 }

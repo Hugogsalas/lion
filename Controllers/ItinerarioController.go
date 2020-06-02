@@ -110,6 +110,63 @@ func GetItinerario(writter http.ResponseWriter, request *http.Request) {
 	return
 }
 
+//UpdateItinerario : Metodo que actualiza itinerarios segun parametros
+func UpdateItinerario(writter http.ResponseWriter, request *http.Request) {
+	var Itinerario models.Itinerario
+	err := json.NewDecoder(request.Body).Decode(&Itinerario)
+	jsonResponse := simplejson.New()
+	if err == nil {
+
+		var ItinerarioFilters []string
+		var ItinerarioFiltersValues []interface{}
+
+		ItinerarioFilters = append(ItinerarioFilters, "ID")
+		ItinerarioFiltersValues = append(ItinerarioFiltersValues, Itinerario.ID)
+
+		var ItinerarioValues []interface{}
+		var ItinerarioStrings []string
+
+		ItinerarioValues = utilities.ObjectValues(Itinerario)
+		ItinerarioStrings = utilities.ObjectFields(Itinerario)
+
+		ItinerarioValues[0] = nil
+
+		if ItinerarioValues[1] == "" {
+			ItinerarioValues[1] = nil
+		}
+		
+
+		ItinerarioRows, err := utilities.UpdateObject("Itinerario", ItinerarioFilters, ItinerarioFiltersValues, ItinerarioStrings, ItinerarioValues)
+		if err == nil {
+
+			if ItinerarioRows {
+
+				jsonResponse.Set("Exito", true)
+				jsonResponse.Set("Message", "Itinerario actualizado")
+
+			} else {
+
+				jsonResponse.Set("Exito", false)
+				jsonResponse.Set("Message", err.Error())
+				
+			}
+
+		} else {
+			jsonResponse.Set("Exito", false)
+			jsonResponse.Set("Message", err.Error())
+		}
+
+	} else {
+		jsonResponse.Set("Exito", false)
+		jsonResponse.Set("Message", err.Error())
+	}
+
+	payload, err := jsonResponse.MarshalJSON()
+	writter.Header().Set("Content-Type", "application/json")
+	writter.Write(payload)
+	return
+}
+
 //QueryToItinerario : Metodo que transforma la consulta a objetos Itinerario
 func QueryToItinerario(result *sql.Rows) ([]models.Itinerario, error) {
 	var itinerarioAux models.Itinerario
