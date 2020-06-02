@@ -1,5 +1,3 @@
-
-
 DELIMITER $$
 create procedure PASalaExposicion(
 	in IDSala int,
@@ -45,7 +43,7 @@ begin
         TiposExposicion.ID=Exposicion.IDTipo and
         SalaExposicion.IDSala=IDSala and 
         SalaExposicion.IDExposicion=Exposicion.ID;
-    else 
+    elseif  IDExposicion!=0 then
 		select 
 		Sala.ID,
 		Sala.Nombre,
@@ -64,6 +62,24 @@ begin
         TiposExposicion.ID=Exposicion.IDTipo and
         SalaExposicion.IDSala=Sala.ID and 
         SalaExposicion.IDExposicion=IDExposicion;
+	else 
+		select 
+		Sala.ID,
+		Sala.Nombre,
+        Exposicion.ID,
+		Exposicion.Presentador,
+		Exposicion.Titulo,
+        Exposicion.Duracion,
+        TiposExposicion.Descripcion
+		from 
+        lioness.Sala,
+        lioness.Exposicion,
+        lioness.SalaExposicion,
+        lioness.TiposExposicion
+		where
+        TiposExposicion.ID=Exposicion.IDTipo and
+        SalaExposicion.IDSala=Sala.ID and 
+        SalaExposicion.IDExposicion=Exposicion.ID;
 	end if;
-END
-$$DELIMITER ;
+END$$
+DELIMITER ;

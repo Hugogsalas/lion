@@ -107,6 +107,63 @@ func GetTiposExposicion(writter http.ResponseWriter, request *http.Request) {
 	return
 }
 
+//UpdateTiposExposicion : Metodo que actualiza TiposExposicion segun parametros
+func UpdateTiposExposicion(writter http.ResponseWriter, request *http.Request) {
+	var TiposExposicion models.TiposExposicion
+	err := json.NewDecoder(request.Body).Decode(&TiposExposicion)
+	jsonResponse := simplejson.New()
+	if err == nil {
+
+		var TiposExposicionFilters []string
+		var TiposExposicionFiltersValues []interface{}
+
+		TiposExposicionFilters = append(TiposExposicionFilters, "ID")
+		TiposExposicionFiltersValues = append(TiposExposicionFiltersValues, TiposExposicion.ID)
+
+		var TiposExposicionValues []interface{}
+		var TiposExposicionStrings []string
+
+		TiposExposicionValues = utilities.ObjectValues(TiposExposicion)
+		TiposExposicionStrings = utilities.ObjectFields(TiposExposicion)
+
+		TiposExposicionValues[0] = nil
+
+		if TiposExposicionValues[1] == "" {
+			TiposExposicionValues[1] = nil
+		}
+
+		TiposExposicionRows, err := utilities.UpdateObject("TiposExposicion", TiposExposicionFilters, TiposExposicionFiltersValues, TiposExposicionStrings, TiposExposicionValues)
+		if err == nil {
+
+			if TiposExposicionRows {
+
+				jsonResponse.Set("Exito", true)
+				jsonResponse.Set("Message", "TiposExposicion actualizado")
+
+			} else {
+
+				jsonResponse.Set("Exito", false)
+				jsonResponse.Set("Message", err.Error())
+
+			}
+
+		} else {
+			jsonResponse.Set("Exito", false)
+			jsonResponse.Set("Message", err.Error())
+		}
+
+	} else {
+		jsonResponse.Set("Exito", false)
+		jsonResponse.Set("Message", err.Error())
+	}
+
+	payload, err := jsonResponse.MarshalJSON()
+	writter.Header().Set("Content-Type", "application/json")
+	writter.Write(payload)
+	return
+}
+
+
 //QueryToTiposExposicion : Metodo que transforma la consulta a objetos TiposExposicion
 func QueryToTiposExposicion(result *sql.Rows) ([]models.TiposExposicion, error) {
 	var TiposExposicionAux models.TiposExposicion

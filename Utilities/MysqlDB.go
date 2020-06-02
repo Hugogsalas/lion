@@ -107,15 +107,15 @@ func GetObject(table []string, selects []string, params []string, values []inter
 		}
 	}
 
-	where:=false
+	where := false
 
 	multiple := false
 
 	for i := 0; i < len(values); i++ {
 		if values[i] != nil {
-			if where==false{
-				command+=" WHERE "
-				where=true
+			if where == false {
+				command += " WHERE "
+				where = true
 			}
 			if multiple {
 				command += " AND "
@@ -139,6 +139,64 @@ func GetObject(table []string, selects []string, params []string, values []inter
 	return result, nil
 }
 
+//UpdateObject : metodo que actualiza parametros de objetos por filtros
+func UpdateObject(table string, selects []string, filters []interface{}, params []string, values []interface{}) (bool, error) {
+	var command string
+
+	command += "UPDATE " + table + " SET "
+
+	comma := false
+
+	for i := 0; i < len(values); i++ {
+		if values[i] != nil {
+			var varType string = fmt.Sprintf("%T", values[i])
+			var varString string = fmt.Sprintf("%v", values[i])
+			if comma == false {
+				comma = true
+			} else {
+				command += ","
+			}
+			if varType != "string" {
+				command += params[i] + " = " + varString
+			} else {
+				command += params[i] + " = '" + varString + "'"
+			}
+		}
+	}
+
+	where := false
+
+	for i := 0; i < len(filters); i++ {
+		if filters[i] != nil {
+			if where == false {
+				command += " WHERE "
+				where = true
+			} else {
+				command += " AND "
+			}
+			var varType string = fmt.Sprintf("%T", filters[i])
+			var varString string = fmt.Sprintf("%v", filters[i])
+			if varType != "string" {
+				command += selects[i] + "=" + varString
+			} else {
+				command += selects[i] + "='" + varString + "'"
+			}
+		}
+	}
+	fmt.Println(command)
+	result, err := ExecuteQuery(command)
+
+	if err != nil {
+		return false, err
+	} else {
+		if result != nil {
+			return true, nil
+		} else {
+			return false, nil
+		}
+	}
+}
+
 //CallStorageProcedure : funcion que lla a un procedimiento almacenado
 func CallStorageProcedure(Name string, Values []interface{}) (*sql.Rows, error) {
 	command := "call " + Name + "("
@@ -148,7 +206,7 @@ func CallStorageProcedure(Name string, Values []interface{}) (*sql.Rows, error) 
 		var varString string = fmt.Sprintf("%v", Values[i])
 		if varType == "string" {
 			command += "'" + varString + "'"
-		}else if Values[i]==nil{
+		} else if Values[i] == nil {
 			command += "null"
 		} else {
 			command += varString

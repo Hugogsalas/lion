@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/bitly/go-simplejson"
+	"github.com/mitchellh/mapstructure"
 
 	models "../Models"
 	utilities "../Utilities"
@@ -87,6 +88,76 @@ func GetItinerarioTaller(writter http.ResponseWriter, request *http.Request) {
 			} else {
 				jsonResponse.Set("Exito", false)
 				jsonResponse.Set("Message", err.Error())
+			}
+
+		} else {
+			jsonResponse.Set("Exito", false)
+			jsonResponse.Set("Message", err.Error())
+		}
+
+	} else {
+		jsonResponse.Set("Exito", false)
+		jsonResponse.Set("Message", err.Error())
+	}
+
+	payload, err := jsonResponse.MarshalJSON()
+	writter.Header().Set("Content-Type", "application/json")
+	writter.Write(payload)
+	return
+}
+
+//UpdateItinerarioTaller : Metodo que actualiza ItinerarioTaller segun parametros
+func UpdateItinerarioTaller(writter http.ResponseWriter, request *http.Request) {
+	var lastItinerarioTaller models.ItinerarioTaller
+	var newItinerarioTaller models.ItinerarioTaller
+	var recipient map[string]interface{}
+	err := json.NewDecoder(request.Body).Decode(&recipient)
+	jsonResponse := simplejson.New()
+	if err == nil {
+
+		mapstructure.Decode(recipient["filter"], &lastItinerarioTaller)
+		mapstructure.Decode(recipient["update"], &newItinerarioTaller)
+
+		var ItinerarioTallerFiltersValues []interface{}
+		var ItinerarioTallerFilters []string
+
+		ItinerarioTallerFiltersValues =utilities.ObjectValues(lastItinerarioTaller)
+		ItinerarioTallerFilters =utilities.ObjectFields(lastItinerarioTaller)
+
+		var ItinerarioTallerValues []interface{}
+		var ItinerarioTallerStrings []string
+
+		ItinerarioTallerValues = utilities.ObjectValues(newItinerarioTaller)
+		ItinerarioTallerStrings = utilities.ObjectFields(newItinerarioTaller)
+
+		for i:=1;i<2;i++{
+			if ItinerarioTallerValues[i] == 0 {
+				ItinerarioTallerValues[i] = nil
+			}
+			if ItinerarioTallerFiltersValues[i] == 0 {
+				ItinerarioTallerFiltersValues[i] = nil
+			}
+		}
+		if ItinerarioTallerValues[2] == "" {
+			ItinerarioTallerValues[2] = nil
+		}
+		if ItinerarioTallerFiltersValues[2] == "" {
+			ItinerarioTallerFiltersValues[2] = nil
+		}
+
+		ItinerarioTallerRows, err := utilities.UpdateObject("ItinerarioTaller", ItinerarioTallerFilters, ItinerarioTallerFiltersValues, ItinerarioTallerStrings, ItinerarioTallerValues)
+		if err == nil {
+
+			if ItinerarioTallerRows {
+
+				jsonResponse.Set("Exito", true)
+				jsonResponse.Set("Message", "ItinerarioTaller actualizado")
+
+			} else {
+
+				jsonResponse.Set("Exito", false)
+				jsonResponse.Set("Message", err.Error())
+
 			}
 
 		} else {

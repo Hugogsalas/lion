@@ -112,12 +112,83 @@ func GetTaller(writter http.ResponseWriter, request *http.Request) {
 	return
 }
 
+//UpdateTaller : Metodo que actualiza Taller segun parametros
+func UpdateTaller(writter http.ResponseWriter, request *http.Request) {
+	var Taller models.Taller
+	err := json.NewDecoder(request.Body).Decode(&Taller)
+	jsonResponse := simplejson.New()
+	if err == nil {
+
+		var TallerFilters []string
+		var TallerFiltersValues []interface{}
+
+		TallerFilters = append(TallerFilters, "ID")
+		TallerFiltersValues = append(TallerFiltersValues, Taller.ID)
+
+		var TallerValues []interface{}
+		var TallerStrings []string
+
+		TallerValues = utilities.ObjectValues(Taller)
+		TallerStrings = utilities.ObjectFields(Taller)
+
+		TallerValues[0] = nil
+
+		for i := 1; i < 3 ; i++ {
+			if TallerValues[i] == 0 {
+				TallerValues[i] = nil
+			}
+		}
+		
+
+		for i := 3; i < len(TallerStrings); i++ {
+			if TallerValues[i] == "" {
+				TallerValues[i] = nil
+			}
+		}
+
+
+		TallerRows, err := utilities.UpdateObject("Taller", TallerFilters, TallerFiltersValues, TallerStrings, TallerValues)
+		if err == nil {
+
+			if TallerRows {
+
+				jsonResponse.Set("Exito", true)
+				jsonResponse.Set("Message", "Taller actualizado")
+
+			} else {
+
+				jsonResponse.Set("Exito", false)
+				jsonResponse.Set("Message", err.Error())
+
+			}
+
+		} else {
+			jsonResponse.Set("Exito", false)
+			jsonResponse.Set("Message", err.Error())
+		}
+
+	} else {
+		jsonResponse.Set("Exito", false)
+		jsonResponse.Set("Message", err.Error())
+	}
+
+	payload, err := jsonResponse.MarshalJSON()
+	writter.Header().Set("Content-Type", "application/json")
+	writter.Write(payload)
+	return
+}
+
 //QueryToTaller : Metodo que transforma la consulta a objetos Taller
 func QueryToTaller(result *sql.Rows) ([]models.Taller, error) {
 	var TallerAux models.Taller
 	var recipents []models.Taller
 	for result.Next() {
-		err := result.Scan(&TallerAux.ID, &TallerAux.Nombre, &TallerAux.Enfoque, &TallerAux.IDTipo, &TallerAux.Duracion )
+		err := result.Scan(
+			&TallerAux.ID,
+			 &TallerAux.Nombre, 
+			 &TallerAux.Enfoque,
+			 &TallerAux.Duracion, 
+			 &TallerAux.IDTipo)
 		if err != nil {
 			return nil, err
 		}

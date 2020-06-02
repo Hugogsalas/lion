@@ -104,6 +104,62 @@ func GetSala(writter http.ResponseWriter, request *http.Request) {
 	return
 }
 
+//UpdateSala : Metodo que actualiza Salas segun parametros
+func UpdateSala(writter http.ResponseWriter, request *http.Request) {
+	var Sala models.Sala
+	err := json.NewDecoder(request.Body).Decode(&Sala)
+	jsonResponse := simplejson.New()
+	if err == nil {
+
+		var SalaFilters []string
+		var SalaFiltersValues []interface{}
+
+		SalaFilters = append(SalaFilters, "ID")
+		SalaFiltersValues = append(SalaFiltersValues, Sala.ID)
+
+		var SalaValues []interface{}
+		var SalaStrings []string
+
+		SalaValues = utilities.ObjectValues(Sala)
+		SalaStrings = utilities.ObjectFields(Sala)
+
+		SalaValues[0] = nil
+
+		if SalaValues[1] == "" {
+			SalaValues[1] = nil
+		}
+
+		SalaRows, err := utilities.UpdateObject("Sala", SalaFilters, SalaFiltersValues, SalaStrings, SalaValues)
+		if err == nil {
+
+			if SalaRows {
+
+				jsonResponse.Set("Exito", true)
+				jsonResponse.Set("Message", "Sala actualizada")
+
+			} else {
+
+				jsonResponse.Set("Exito", false)
+				jsonResponse.Set("Message", err.Error())
+
+			}
+
+		} else {
+			jsonResponse.Set("Exito", false)
+			jsonResponse.Set("Message", err.Error())
+		}
+
+	} else {
+		jsonResponse.Set("Exito", false)
+		jsonResponse.Set("Message", err.Error())
+	}
+
+	payload, err := jsonResponse.MarshalJSON()
+	writter.Header().Set("Content-Type", "application/json")
+	writter.Write(payload)
+	return
+}
+
 //QueryToSala : Metodo que transforma la consulta a objetos Sala
 func QueryToSala(result *sql.Rows) ([]models.Sala, error) {
 	var SalaAux models.Sala

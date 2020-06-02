@@ -114,6 +114,70 @@ func GetExposicion(writter http.ResponseWriter, request *http.Request) {
 	return
 }
 
+//UpdateExposicion : Metodo que actualiza exposicion segun parametros
+func UpdateExposicion(writter http.ResponseWriter, request *http.Request) {
+	var Exposicion models.Exposicion
+	err := json.NewDecoder(request.Body).Decode(&Exposicion)
+	jsonResponse := simplejson.New()
+	if err == nil {
+
+		var ExposicionFilters []string
+		var ExposicionFiltersValues []interface{}
+
+		ExposicionFilters = append(ExposicionFilters, "ID")
+		ExposicionFiltersValues = append(ExposicionFiltersValues, Exposicion.ID)
+
+		var ExposicionValues []interface{}
+		var ExposicionStrings []string
+
+		ExposicionValues = utilities.ObjectValues(Exposicion)
+		ExposicionStrings = utilities.ObjectFields(Exposicion)
+
+		ExposicionValues[0] = nil
+
+		for i := 1; i < 3; i++ {
+			if ExposicionValues[i] == 0 {
+				ExposicionValues[i] = nil
+			}
+		}
+
+		for i := 3; i < 5; i++ {
+			if ExposicionValues[i] == "" {
+				ExposicionValues[i] = nil
+			}
+		}
+
+		ExposicionRows, err := utilities.UpdateObject("Exposicion", ExposicionFilters, ExposicionFiltersValues, ExposicionStrings, ExposicionValues)
+		if err == nil {
+
+			if ExposicionRows {
+
+				jsonResponse.Set("Exito", true)
+				jsonResponse.Set("Message", "Exposicion actualizada")
+
+			} else {
+
+				jsonResponse.Set("Exito", false)
+				jsonResponse.Set("Message", err.Error())
+
+			}
+
+		} else {
+			jsonResponse.Set("Exito", false)
+			jsonResponse.Set("Message", err.Error())
+		}
+
+	} else {
+		jsonResponse.Set("Exito", false)
+		jsonResponse.Set("Message", err.Error())
+	}
+
+	payload, err := jsonResponse.MarshalJSON()
+	writter.Header().Set("Content-Type", "application/json")
+	writter.Write(payload)
+	return
+}
+
 //QueryToExposicion : Metodo que transforma la consulta a objetos Exposicion
 func QueryToExposicion(result *sql.Rows) ([]models.Exposicion, error) {
 	var exposicionAux models.Exposicion

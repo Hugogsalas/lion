@@ -4,7 +4,8 @@ import (
 	"database/sql"
 	"encoding/json"
 	"net/http"
-
+	
+	"github.com/mitchellh/mapstructure"
 	"github.com/bitly/go-simplejson"
 
 	models "../Models"
@@ -57,7 +58,7 @@ func GetAutorLibro(writter http.ResponseWriter, request *http.Request) {
 
 	if err == nil {
 
-		AutorLibroRows, err := utilities.CallStorageProcedure(" ", []interface{}{AutorLibro.IDAutor, AutorLibro.IDLibro})
+		AutorLibroRows, err := utilities.CallStorageProcedure("PAAutorLibro", []interface{}{AutorLibro.IDAutor, AutorLibro.IDLibro})
 		if err == nil {
 			var AutorLibroResultado []map[string]interface{}
 
@@ -79,6 +80,70 @@ func GetAutorLibro(writter http.ResponseWriter, request *http.Request) {
 			} else {
 				jsonResponse.Set("Exito", false)
 				jsonResponse.Set("Message", err.Error())
+			}
+
+		} else {
+			jsonResponse.Set("Exito", false)
+			jsonResponse.Set("Message", err.Error())
+		}
+
+	} else {
+		jsonResponse.Set("Exito", false)
+		jsonResponse.Set("Message", err.Error())
+	}
+
+	payload, err := jsonResponse.MarshalJSON()
+	writter.Header().Set("Content-Type", "application/json")
+	writter.Write(payload)
+	return
+}
+
+//UpdateAutorLibro : Metodo que actualiza AutorLibro segun parametros
+func UpdateAutorLibro(writter http.ResponseWriter, request *http.Request) {
+	var lastAutorLibro models.AutorLibro
+	var newAutorLibro models.AutorLibro
+	var recipient map[string]interface{}
+	err := json.NewDecoder(request.Body).Decode(&recipient)
+	jsonResponse := simplejson.New()
+	if err == nil {
+
+		mapstructure.Decode(recipient["filter"], &lastAutorLibro)
+		mapstructure.Decode(recipient["update"], &newAutorLibro)
+
+		var AutorLibroFiltersValues []interface{}
+		var AutorLibroFilters []string
+
+		AutorLibroFiltersValues =utilities.ObjectValues(lastAutorLibro)
+		AutorLibroFilters =utilities.ObjectFields(lastAutorLibro)
+
+		var AutorLibroValues []interface{}
+		var AutorLibroStrings []string
+
+		AutorLibroValues = utilities.ObjectValues(newAutorLibro)
+		AutorLibroStrings = utilities.ObjectFields(newAutorLibro)
+
+		for i:=0;i<len(AutorLibroValues);i++{
+			if AutorLibroValues[i] == 0 {
+				AutorLibroValues[i] = nil
+			}
+			if AutorLibroFiltersValues[i] == 0 {
+				AutorLibroFiltersValues[i] = nil
+			}
+		}
+
+		AutorLibroRows, err := utilities.UpdateObject("AutorLibro", AutorLibroFilters, AutorLibroFiltersValues, AutorLibroStrings, AutorLibroValues)
+		if err == nil {
+
+			if AutorLibroRows {
+
+				jsonResponse.Set("Exito", true)
+				jsonResponse.Set("Message", "AutorLibro actualizado")
+
+			} else {
+
+				jsonResponse.Set("Exito", false)
+				jsonResponse.Set("Message", err.Error())
+
 			}
 
 		} else {

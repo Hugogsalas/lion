@@ -54,7 +54,7 @@ func CreateUser(writter http.ResponseWriter, request *http.Request) {
 	return
 }
 
-//LoginUser : Metodo que retorna un usaurio por su correo y clave
+//LoginUser : Metodo que retorna un usuario por su correo y clave
 func LoginUser(writter http.ResponseWriter, request *http.Request) {
 	var usuario models.Usuario
 	hash := sha256.New()

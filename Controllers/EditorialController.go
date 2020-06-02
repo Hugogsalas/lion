@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"net/http"
-	
+
 	"github.com/bitly/go-simplejson"
 
 	models "../Models"
@@ -14,7 +14,7 @@ import (
 //CreateEditorial : Metodo de insercion de una nueva editorial
 func CreateEditorial(writter http.ResponseWriter, request *http.Request) {
 	var Editorial models.Editorial
-	
+
 	err := json.NewDecoder(request.Body).Decode(&Editorial)
 
 	json := simplejson.New()
@@ -106,6 +106,62 @@ func GetEditorial(writter http.ResponseWriter, request *http.Request) {
 	return
 }
 
+//UpdateEditorial : Metodo que actualiza editoriales segun parametros
+func UpdateEditorial(writter http.ResponseWriter, request *http.Request) {
+	var editorial models.Editorial
+	err := json.NewDecoder(request.Body).Decode(&editorial)
+	jsonResponse := simplejson.New()
+	if err == nil {
+
+		var editorialFilters []string
+		var editorialFiltersValues []interface{}
+
+		editorialFilters = append(editorialFilters, "ID")
+		editorialFiltersValues = append(editorialFiltersValues, editorial.ID)
+
+		var editorialValues []interface{}
+		var editorialStrings []string
+
+		editorialValues = utilities.ObjectValues(editorial)
+		editorialStrings = utilities.ObjectFields(editorial)
+
+		editorialValues[0] = nil
+
+		if editorialValues[1] == "" {
+			editorialValues[1] = nil
+		}
+
+		editorialRows, err := utilities.UpdateObject("Editorial", editorialFilters, editorialFiltersValues, editorialStrings, editorialValues)
+		if err == nil {
+
+			if editorialRows {
+
+				jsonResponse.Set("Exito", true)
+				jsonResponse.Set("Message", "Editorial actualizada")
+
+			} else {
+
+				jsonResponse.Set("Exito", false)
+				jsonResponse.Set("Message", err.Error())
+
+			}
+
+		} else {
+			jsonResponse.Set("Exito", false)
+			jsonResponse.Set("Message", err.Error())
+		}
+
+	} else {
+		jsonResponse.Set("Exito", false)
+		jsonResponse.Set("Message", err.Error())
+	}
+
+	payload, err := jsonResponse.MarshalJSON()
+	writter.Header().Set("Content-Type", "application/json")
+	writter.Write(payload)
+	return
+}
+
 //QueryToEditorial : Metodo que transforma la consulta a objetos Editorial
 func QueryToEditorial(result *sql.Rows) ([]models.Editorial, error) {
 	var editorialAux models.Editorial
@@ -123,10 +179,10 @@ func QueryToEditorial(result *sql.Rows) ([]models.Editorial, error) {
 //EditorialesToInterfaces : metodo que transforma un arreglo de Editoriales en interfaces
 func EditorialesToInterfaces(Editoriales []models.Editorial) []interface{} {
 	var arrayInterface []interface{}
-	for i:=0;i<len(Editoriales);i++{
+	for i := 0; i < len(Editoriales); i++ {
 		var editorialInterface interface{}
-		editorialInterface=Editoriales[i]
-		arrayInterface=append(arrayInterface,editorialInterface)
+		editorialInterface = Editoriales[i]
+		arrayInterface = append(arrayInterface, editorialInterface)
 	}
 	return arrayInterface
 }

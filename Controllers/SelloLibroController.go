@@ -70,7 +70,7 @@ func GetSelloLibro(writter http.ResponseWriter, request *http.Request) {
 			if err == nil {
 				if len(SelloLibroResultado) > 0 {
 					jsonResponse.Set("Exito", true)
-					jsonResponse.Set("Message", "AutorLibro encontrado")
+					jsonResponse.Set("Message", "SelloLibro encontrado")
 					jsonResponse.Set("SelloLibro", SelloLibroResultado)
 				} else {
 					jsonResponse.Set("Exito", false)
