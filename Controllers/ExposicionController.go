@@ -88,7 +88,7 @@ func GetExposicion(writter http.ResponseWriter, request *http.Request) {
 				if len(exposicionesResultado) > 0 {
 					jsonResponse.Set("Exito", true)
 					jsonResponse.Set("Message", "exposiciones encontradas")
-					jsonResponse.Set("Libros", exposicionesResultado)
+					jsonResponse.Set("Exposiciones", exposicionesResultado)
 				} else {
 					jsonResponse.Set("Exito", false)
 					jsonResponse.Set("Message", "No se encontraron exposiciones")
