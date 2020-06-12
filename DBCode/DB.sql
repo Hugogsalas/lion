@@ -24,7 +24,7 @@ create table Editorial(
     Nombre varchar (50) not null
 );
 
-create table TiposExposicion(
+create table TiposExposiciones(
     ID int primary key auto_increment not null,
     Descripcion varchar (50) not null
 );
@@ -35,7 +35,7 @@ create table Exposicion(
     Presentador varchar(20) not null,
     Duracion int not null,
     IDTipo int not null,
-    FOREIGN KEY (IDTipo) REFERENCES TiposExposicion(ID) ON DELETE CASCADE
+    FOREIGN KEY (IDTipo) REFERENCES TiposExposiciones(ID) ON DELETE CASCADE
 );
 
 create table Itinerario(

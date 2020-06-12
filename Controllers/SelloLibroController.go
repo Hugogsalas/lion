@@ -144,6 +144,47 @@ func UpdateSelloLibro(writter http.ResponseWriter, request *http.Request) {
 	return
 }
 
+//DeleteSelloLibro : Metodo que elimina SelloLibros segun parametros
+func DeleteSelloLibro(writter http.ResponseWriter, request *http.Request) {
+	var SelloLibro models.SelloLibro
+	err := json.NewDecoder(request.Body).Decode(&SelloLibro)
+	jsonResponse := simplejson.New()
+	if err == nil {
+
+		SelloLibroStrings, SelloLibroValues := utilities.ObjectFields(SelloLibro)
+
+		SelloLibroDel, err := utilities.DeleteObject("SelloLibro", SelloLibroStrings, SelloLibroValues)
+		if err == nil {
+
+			if SelloLibroDel {
+
+				jsonResponse.Set("Exito", true)
+				jsonResponse.Set("Message", "SelloLibro eliminado")
+
+			} else {
+
+				jsonResponse.Set("Exito", false)
+				jsonResponse.Set("Message", err.Error())
+
+			}
+
+		} else {
+			jsonResponse.Set("Exito", false)
+			jsonResponse.Set("Message", err.Error())
+		}
+
+	} else {
+		jsonResponse.Set("Exito", false)
+		jsonResponse.Set("Message", err.Error())
+	}
+
+	payload, err := jsonResponse.MarshalJSON()
+	writter.Header().Set("Content-Type", "application/json")
+	writter.Write(payload)
+	return
+}
+
+
 //SelloWithLibros : metodo que combierte una consulta a una relacion Sello con libros descritos
 func SelloWithLibros(result *sql.Rows) ([]map[string]interface{}, error) {
 	var LibroAux models.Libro

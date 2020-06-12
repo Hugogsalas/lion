@@ -143,6 +143,46 @@ func UpdateTiposTaller(writter http.ResponseWriter, request *http.Request) {
 	return
 }
 
+//DeleteTiposTalleres : Metodo que elimina TiposTalleres segun parametros
+func DeleteTiposTalleres(writter http.ResponseWriter, request *http.Request) {
+	var TiposTaller models.TiposTalleres
+	err := json.NewDecoder(request.Body).Decode(&TiposTaller)
+	jsonResponse := simplejson.New()
+	if err == nil {
+
+		TiposTallerStrings, TiposTallerValues := utilities.ObjectFields(TiposTaller)
+
+		TiposTallerDel, err := utilities.DeleteObject("TiposTaller", TiposTallerStrings, TiposTallerValues)
+		if err == nil {
+
+			if TiposTallerDel {
+
+				jsonResponse.Set("Exito", true)
+				jsonResponse.Set("Message", "TiposTaller eliminado")
+
+			} else {
+
+				jsonResponse.Set("Exito", false)
+				jsonResponse.Set("Message", err.Error())
+
+			}
+
+		} else {
+			jsonResponse.Set("Exito", false)
+			jsonResponse.Set("Message", err.Error())
+		}
+
+	} else {
+		jsonResponse.Set("Exito", false)
+		jsonResponse.Set("Message", err.Error())
+	}
+
+	payload, err := jsonResponse.MarshalJSON()
+	writter.Header().Set("Content-Type", "application/json")
+	writter.Write(payload)
+	return
+}
+
 //QueryToTiposTalleres : Metodo que transforma la consulta a objetos TiposTalleres
 func QueryToTiposTalleres(result *sql.Rows) ([]models.TiposTalleres, error) {
 	var TiposTalleresAux models.TiposTalleres

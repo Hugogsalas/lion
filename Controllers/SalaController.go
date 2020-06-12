@@ -151,6 +151,46 @@ func UpdateSala(writter http.ResponseWriter, request *http.Request) {
 	return
 }
 
+//DeleteSala : Metodo que elimina Salas segun parametros
+func DeleteSala(writter http.ResponseWriter, request *http.Request) {
+	var Sala models.Sala
+	err := json.NewDecoder(request.Body).Decode(&Sala)
+	jsonResponse := simplejson.New()
+	if err == nil {
+
+		SalaStrings, SalaValues := utilities.ObjectFields(Sala)
+
+		SalaDel, err := utilities.DeleteObject("Sala", SalaStrings, SalaValues)
+		if err == nil {
+
+			if SalaDel {
+
+				jsonResponse.Set("Exito", true)
+				jsonResponse.Set("Message", "Sala eliminada")
+
+			} else {
+
+				jsonResponse.Set("Exito", false)
+				jsonResponse.Set("Message", err.Error())
+
+			}
+
+		} else {
+			jsonResponse.Set("Exito", false)
+			jsonResponse.Set("Message", err.Error())
+		}
+
+	} else {
+		jsonResponse.Set("Exito", false)
+		jsonResponse.Set("Message", err.Error())
+	}
+
+	payload, err := jsonResponse.MarshalJSON()
+	writter.Header().Set("Content-Type", "application/json")
+	writter.Write(payload)
+	return
+}
+
 //QueryToSala : Metodo que transforma la consulta a objetos Sala
 func QueryToSala(result *sql.Rows) ([]models.Sala, error) {
 	var SalaAux models.Sala

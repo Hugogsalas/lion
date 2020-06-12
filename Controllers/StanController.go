@@ -201,6 +201,46 @@ func UpdateStan(writter http.ResponseWriter, request *http.Request) {
 	return
 }
 
+//DeleteStan : Metodo que elimina Stans segun parametros
+func DeleteStan(writter http.ResponseWriter, request *http.Request) {
+	var Stan models.Stan
+	err := json.NewDecoder(request.Body).Decode(&Stan)
+	jsonResponse := simplejson.New()
+	if err == nil {
+
+		StanStrings, StanValues := utilities.ObjectFields(Stan)
+
+		StanDel, err := utilities.DeleteObject("Stan", StanStrings, StanValues)
+		if err == nil {
+
+			if StanDel {
+
+				jsonResponse.Set("Exito", true)
+				jsonResponse.Set("Message", "Stan eliminado")
+
+			} else {
+
+				jsonResponse.Set("Exito", false)
+				jsonResponse.Set("Message", err.Error())
+
+			}
+
+		} else {
+			jsonResponse.Set("Exito", false)
+			jsonResponse.Set("Message", err.Error())
+		}
+
+	} else {
+		jsonResponse.Set("Exito", false)
+		jsonResponse.Set("Message", err.Error())
+	}
+
+	payload, err := jsonResponse.MarshalJSON()
+	writter.Header().Set("Content-Type", "application/json")
+	writter.Write(payload)
+	return
+}
+
 //QueryToStan : Metodo que transforma la consulta a objetos Stan
 func QueryToStan(result *sql.Rows) ([]models.Stan, error) {
 	var StanAux models.Stan

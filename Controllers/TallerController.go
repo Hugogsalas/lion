@@ -147,6 +147,46 @@ func UpdateTaller(writter http.ResponseWriter, request *http.Request) {
 	return
 }
 
+//DeleteTaller : Metodo que elimina Talleres segun parametros
+func DeleteTaller(writter http.ResponseWriter, request *http.Request) {
+	var Taller models.Taller
+	err := json.NewDecoder(request.Body).Decode(&Taller)
+	jsonResponse := simplejson.New()
+	if err == nil {
+
+		TallerStrings, TallerValues := utilities.ObjectFields(Taller)
+
+		TallerDel, err := utilities.DeleteObject("Taller", TallerStrings, TallerValues)
+		if err == nil {
+
+			if TallerDel {
+
+				jsonResponse.Set("Exito", true)
+				jsonResponse.Set("Message", "Taller eliminado")
+
+			} else {
+
+				jsonResponse.Set("Exito", false)
+				jsonResponse.Set("Message", err.Error())
+
+			}
+
+		} else {
+			jsonResponse.Set("Exito", false)
+			jsonResponse.Set("Message", err.Error())
+		}
+
+	} else {
+		jsonResponse.Set("Exito", false)
+		jsonResponse.Set("Message", err.Error())
+	}
+
+	payload, err := jsonResponse.MarshalJSON()
+	writter.Header().Set("Content-Type", "application/json")
+	writter.Write(payload)
+	return
+}
+
 //QueryToTaller : Metodo que transforma la consulta a objetos Taller
 func QueryToTaller(result *sql.Rows) ([]models.Taller, error) {
 	var TallerAux models.Taller

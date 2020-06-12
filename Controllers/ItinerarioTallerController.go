@@ -150,6 +150,46 @@ func UpdateItinerarioTaller(writter http.ResponseWriter, request *http.Request) 
 	return
 }
 
+//DeleteItinerarioTaller : Metodo que elimina ItinerarioTaller segun parametros
+func DeleteItinerarioTaller(writter http.ResponseWriter, request *http.Request) {
+	var ItinerarioTaller models.ItinerarioTaller
+	err := json.NewDecoder(request.Body).Decode(&ItinerarioTaller)
+	jsonResponse := simplejson.New()
+	if err == nil {
+
+		ItinerarioTallerStrings, ItinerarioTallerValues := utilities.ObjectFields(ItinerarioTaller)
+
+		ItinerarioTallerDel, err := utilities.DeleteObject("ItinerarioTaller", ItinerarioTallerStrings, ItinerarioTallerValues)
+		if err == nil {
+
+			if ItinerarioTallerDel {
+
+				jsonResponse.Set("Exito", true)
+				jsonResponse.Set("Message", "ItinerarioTaller eliminado")
+
+			} else {
+
+				jsonResponse.Set("Exito", false)
+				jsonResponse.Set("Message", err.Error())
+
+			}
+
+		} else {
+			jsonResponse.Set("Exito", false)
+			jsonResponse.Set("Message", err.Error())
+		}
+
+	} else {
+		jsonResponse.Set("Exito", false)
+		jsonResponse.Set("Message", err.Error())
+	}
+
+	payload, err := jsonResponse.MarshalJSON()
+	writter.Header().Set("Content-Type", "application/json")
+	writter.Write(payload)
+	return
+}
+
 //ItinerariowithTaller : metodo que retorna una relacion Itinerario-Taller
 func ItinerariowithTaller(result *sql.Rows) ([]map[string]interface{}, error) {
 	var TallerAux models.Taller

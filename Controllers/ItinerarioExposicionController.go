@@ -148,11 +148,52 @@ func UpdateItinerarioExposicion(writter http.ResponseWriter, request *http.Reque
 	return
 }
 
+//DeleteItinerarioExposicion : Metodo que elimina ItinerarioExposicion segun parametros
+func DeleteItinerarioExposicion(writter http.ResponseWriter, request *http.Request) {
+	var ItinerarioExposicion models.ItinerarioExposicion
+	err := json.NewDecoder(request.Body).Decode(&ItinerarioExposicion)
+	jsonResponse := simplejson.New()
+	if err == nil {
+
+		ItinerarioExposicionStrings, ItinerarioExposicionValues := utilities.ObjectFields(ItinerarioExposicion)
+
+		ItinerarioExposicionDel, err := utilities.DeleteObject("ItinerarioExposicion", ItinerarioExposicionStrings, ItinerarioExposicionValues)
+		if err == nil {
+
+			if ItinerarioExposicionDel {
+
+				jsonResponse.Set("Exito", true)
+				jsonResponse.Set("Message", "ItinerarioExposicion eliminado")
+
+			} else {
+
+				jsonResponse.Set("Exito", false)
+				jsonResponse.Set("Message", err.Error())
+
+			}
+
+		} else {
+			jsonResponse.Set("Exito", false)
+			jsonResponse.Set("Message", err.Error())
+		}
+
+	} else {
+		jsonResponse.Set("Exito", false)
+		jsonResponse.Set("Message", err.Error())
+	}
+
+	payload, err := jsonResponse.MarshalJSON()
+	writter.Header().Set("Content-Type", "application/json")
+	writter.Write(payload)
+	return
+}
+
+
 //ItinerariowithExposicion : metodo que retorna una relacion Itinerario-Exposicion
 func ItinerariowithExposicion(result *sql.Rows) ([]map[string]interface{}, error) {
 	var ExposicionAux models.Exposicion
 	var ItinerarioAux models.Itinerario
-	var tipoAux models.TiposExposicion
+	var tipoAux models.TiposExposiciones
 	var Itinerarios []models.Itinerario
 	var ItinerarioExposcionAux models.ItinerarioExposicion
 	var response []map[string]interface{}
@@ -206,7 +247,7 @@ func ItinerariowithExposicion(result *sql.Rows) ([]map[string]interface{}, error
 func ExposicionWithItinerarios(result *sql.Rows) ([]map[string]interface{}, error) {
 	var ExposicionAux models.Exposicion
 	var ItinerarioAux models.Itinerario
-	var tipoAux models.TiposExposicion
+	var tipoAux models.TiposExposiciones
 	var Exposiciones []models.Exposicion
 	var ItinerarioExposcionAux models.ItinerarioExposicion
 	var response []map[string]interface{}

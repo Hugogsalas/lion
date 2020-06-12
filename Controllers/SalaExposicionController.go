@@ -141,10 +141,50 @@ func UpdateSalaExposicion(writter http.ResponseWriter, request *http.Request) {
 	return
 }
 
+//DeleteSalaExposicion : Metodo que elimina SalaExposiciones segun parametros
+func DeleteSalaExposicion(writter http.ResponseWriter, request *http.Request) {
+	var SalaExposicion models.SalaExposicion
+	err := json.NewDecoder(request.Body).Decode(&SalaExposicion)
+	jsonResponse := simplejson.New()
+	if err == nil {
+
+		SalaExposicionStrings, SalaExposicionValues := utilities.ObjectFields(SalaExposicion)
+
+		SalaExposicionDel, err := utilities.DeleteObject("SalaExposicion", SalaExposicionStrings, SalaExposicionValues)
+		if err == nil {
+
+			if SalaExposicionDel {
+
+				jsonResponse.Set("Exito", true)
+				jsonResponse.Set("Message", "SalaExposicion eliminado")
+
+			} else {
+
+				jsonResponse.Set("Exito", false)
+				jsonResponse.Set("Message", err.Error())
+
+			}
+
+		} else {
+			jsonResponse.Set("Exito", false)
+			jsonResponse.Set("Message", err.Error())
+		}
+
+	} else {
+		jsonResponse.Set("Exito", false)
+		jsonResponse.Set("Message", err.Error())
+	}
+
+	payload, err := jsonResponse.MarshalJSON()
+	writter.Header().Set("Content-Type", "application/json")
+	writter.Write(payload)
+	return
+}
+
 //SalaWithExposiciones : metodo que combierte una consulta a una relacion Sala con Exposiciones descritos
 func SalaWithExposiciones(result *sql.Rows) ([]map[string]interface{}, error) {
 	var ExposicionAux models.Exposicion
-	var tipoAux models.TiposExposicion
+	var tipoAux models.TiposExposiciones
 	var SalaAux models.Sala
 	var Salas []models.Sala
 	var response []map[string]interface{}
@@ -195,7 +235,7 @@ func SalaWithExposiciones(result *sql.Rows) ([]map[string]interface{}, error) {
 //ExposicionesWithSala : metodo que combierte una consulta a una relacion libors con Salas descritos
 func ExposicionesWithSala(result *sql.Rows) ([]map[string]interface{}, error) {
 	var ExposicionAux models.Exposicion
-	var tipoAux models.TiposExposicion
+	var tipoAux models.TiposExposiciones
 	var SalaAux models.Sala
 	var Exposiciones []models.Exposicion
 	var response []map[string]interface{}

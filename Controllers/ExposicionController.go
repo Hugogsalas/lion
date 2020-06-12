@@ -109,11 +109,11 @@ func GetExposicionWithType(writter http.ResponseWriter, request *http.Request) {
 
 		var exposicionQuery models.GetQuery
 
-		exposicionQuery.Tables = []string{"Exposicion", "TiposExposicion"}
+		exposicionQuery.Tables = []string{"Exposicion", "TiposExposiciones"}
 		exposicionQuery.Selects = [][]string{[]string{"ID", "Duracion", "Titulo", "Presentador"}, []string{"Descripcion"}}
 		exposicionQuery.Params = [][]string{expStrings}
 		exposicionQuery.Values = [][]interface{}{expValues}
-		exposicionQuery.Conditions = []string{"TiposExposicion.ID=Exposicion.IDTipo"}
+		exposicionQuery.Conditions = []string{"TiposExposiciones.ID=Exposicion.IDTipo"}
 
 		expRows, err := utilities.GetObject(exposicionQuery)
 		if err == nil {
@@ -196,6 +196,46 @@ func UpdateExposicion(writter http.ResponseWriter, request *http.Request) {
 	return
 }
 
+//DeleteExposicion : Metodo que elimina Exposiciones segun parametros
+func DeleteExposicion(writter http.ResponseWriter, request *http.Request) {
+	var Exposicion models.Exposicion
+	err := json.NewDecoder(request.Body).Decode(&Exposicion)
+	jsonResponse := simplejson.New()
+	if err == nil {
+
+		ExposicionStrings, ExposicionValues := utilities.ObjectFields(Exposicion)
+
+		ExposicionDel, err := utilities.DeleteObject("Exposicion", ExposicionStrings, ExposicionValues)
+		if err == nil {
+
+			if ExposicionDel {
+
+				jsonResponse.Set("Exito", true)
+				jsonResponse.Set("Message", "Exposicion eliminado")
+
+			} else {
+
+				jsonResponse.Set("Exito", false)
+				jsonResponse.Set("Message", err.Error())
+
+			}
+
+		} else {
+			jsonResponse.Set("Exito", false)
+			jsonResponse.Set("Message", err.Error())
+		}
+
+	} else {
+		jsonResponse.Set("Exito", false)
+		jsonResponse.Set("Message", err.Error())
+	}
+
+	payload, err := jsonResponse.MarshalJSON()
+	writter.Header().Set("Content-Type", "application/json")
+	writter.Write(payload)
+	return
+}
+
 //QueryToExposicion : Metodo que transforma la consulta a objetos Exposicion
 func QueryToExposicion(result *sql.Rows) ([]models.Exposicion, error) {
 	var exposicionAux models.Exposicion
@@ -213,7 +253,7 @@ func QueryToExposicion(result *sql.Rows) ([]models.Exposicion, error) {
 //QueryToFullExposicion : Metodo que transforma la consulta a objetos Exposicion
 func QueryToFullExposicion(result *sql.Rows) ([]map[string]interface{}, error) {
 	var exposicionAux models.Exposicion
-	var tipoExpAux models.TiposExposicion
+	var tipoExpAux models.TiposExposiciones
 	var recipents []map[string]interface{}
 	for result.Next() {
 		err := result.Scan(

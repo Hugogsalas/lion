@@ -146,6 +146,46 @@ func UpdateSello(writter http.ResponseWriter, request *http.Request) {
 	return
 }
 
+//DeleteSello : Metodo que elimina Sellos segun parametros
+func DeleteSello(writter http.ResponseWriter, request *http.Request) {
+	var Sello models.Sello
+	err := json.NewDecoder(request.Body).Decode(&Sello)
+	jsonResponse := simplejson.New()
+	if err == nil {
+
+		SelloStrings, SelloValues := utilities.ObjectFields(Sello)
+
+		SelloDel, err := utilities.DeleteObject("Sello", SelloStrings, SelloValues)
+		if err == nil {
+
+			if SelloDel {
+
+				jsonResponse.Set("Exito", true)
+				jsonResponse.Set("Message", "Sello eliminado")
+
+			} else {
+
+				jsonResponse.Set("Exito", false)
+				jsonResponse.Set("Message", err.Error())
+
+			}
+
+		} else {
+			jsonResponse.Set("Exito", false)
+			jsonResponse.Set("Message", err.Error())
+		}
+
+	} else {
+		jsonResponse.Set("Exito", false)
+		jsonResponse.Set("Message", err.Error())
+	}
+
+	payload, err := jsonResponse.MarshalJSON()
+	writter.Header().Set("Content-Type", "application/json")
+	writter.Write(payload)
+	return
+}
+
 //QueryToSello : Metodo que transforma la consulta a objetos Sello
 func QueryToSello(result *sql.Rows) ([]models.Sello, error) {
 	var selloAux models.Sello

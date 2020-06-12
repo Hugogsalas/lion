@@ -2,7 +2,9 @@ package utilities
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
+	"strings"
 
 	models "../Models"
 	_ "github.com/go-sql-driver/mysql"
@@ -56,13 +58,13 @@ func InsertObject(table string, values []interface{}, fields []string) (bool, er
 		var valueString string = fmt.Sprintf("%v", values[i])
 		var typeVar string = fmt.Sprintf("%T", values[i])
 		if typeVar != "string" {
-			if valueString == "<nil>"{
+			if valueString == "<nil>" {
 				command += "null"
 			} else {
 				command += valueString
 			}
 		} else {
-			if valueString == ""{
+			if valueString == "" {
 				command += "null"
 			} else {
 				command += "'" + valueString + "'"
@@ -97,7 +99,7 @@ func GetObject(Query models.GetQuery) (*sql.Rows, error) {
 		for i := 0; i < len(Query.Selects); i++ {
 			for j := 0; j < len(Query.Selects[i]); j++ {
 				if Query.Selects[i][j] != "" {
-					if i == (len(Query.Selects) - 1) && j == (len(Query.Selects[i]) - 1){
+					if i == (len(Query.Selects)-1) && j == (len(Query.Selects[i])-1) {
 						command += Query.Tables[i] + "." + Query.Selects[i][j]
 					} else {
 						command += Query.Tables[i] + "." + Query.Selects[i][j] + ","
@@ -109,7 +111,7 @@ func GetObject(Query models.GetQuery) (*sql.Rows, error) {
 
 	command += " FROM "
 	for i := 0; i < len(Query.Tables); i++ {
-		if i == (len(Query.Tables)-1) {
+		if i == (len(Query.Tables) - 1) {
 			command += Query.Tables[i]
 		} else {
 			command += Query.Tables[i] + ","
@@ -130,9 +132,9 @@ func GetObject(Query models.GetQuery) (*sql.Rows, error) {
 				var varType string = fmt.Sprintf("%T", Query.Values[i][j])
 				var varString string = fmt.Sprintf("%v", Query.Values[i][j])
 				if varType != "string" {
-					command += Query.Tables[i]+"."+Query.Params[i][j] + "=" + varString
+					command += Query.Tables[i] + "." + Query.Params[i][j] + "=" + varString
 				} else {
-					command += Query.Tables[i]+"."+Query.Params[i][j] + "='" + varString + "'"
+					command += Query.Tables[i] + "." + Query.Params[i][j] + "='" + varString + "'"
 				}
 			}
 		}
@@ -200,7 +202,54 @@ func UpdateObject(table string, selects []string, filters []interface{}, params 
 			}
 		}
 	}
-	
+
+	if !strings.Contains(command, "WHERE") {
+		return false, errors.New("No se puede actualizar sin filtrado")
+	}
+
+	result, err := ExecuteQuery(command)
+
+	if err != nil {
+		return false, err
+	} else {
+		if result != nil {
+			return true, nil
+		} else {
+			return false, nil
+		}
+	}
+}
+
+//DeleteObject : metodo que elimina objetos por filtros
+func DeleteObject(table string, selects []string, filters []interface{}) (bool, error) {
+	var command string
+
+	command += "DELETE FROM " + table
+
+	comma := false
+
+	for i := 0; i < len(selects); i++ {
+		if filters[i] != nil {
+			var varType string = fmt.Sprintf("%T", filters[i])
+			var varString string = fmt.Sprintf("%v", filters[i])
+			if comma == false {
+				command += " WHERE "
+				comma = true
+			} else {
+				command += " AND "
+			}
+			if varType != "string" {
+				command += selects[i] + " = " + varString
+			} else {
+				command += selects[i] + " = '" + varString + "'"
+			}
+		}
+	}
+
+	if !strings.Contains(command, "WHERE") {
+		return false, errors.New("No se puede borrar sin filtrado")
+	}
+
 	result, err := ExecuteQuery(command)
 
 	if err != nil {

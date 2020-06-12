@@ -108,7 +108,7 @@ func UpdateAutor(writter http.ResponseWriter, request *http.Request) {
 		autorFilters = append(autorFilters, "ID")
 		autorFiltersValues = append(autorFiltersValues, autor.ID)
 
-		autor.ID=0
+		autor.ID = 0
 
 		autorStrings, autorValues := utilities.ObjectFields(autor)
 
@@ -119,6 +119,46 @@ func UpdateAutor(writter http.ResponseWriter, request *http.Request) {
 
 				jsonResponse.Set("Exito", true)
 				jsonResponse.Set("Message", "Autor actualizado")
+
+			} else {
+
+				jsonResponse.Set("Exito", false)
+				jsonResponse.Set("Message", err.Error())
+
+			}
+
+		} else {
+			jsonResponse.Set("Exito", false)
+			jsonResponse.Set("Message", err.Error())
+		}
+
+	} else {
+		jsonResponse.Set("Exito", false)
+		jsonResponse.Set("Message", err.Error())
+	}
+
+	payload, err := jsonResponse.MarshalJSON()
+	writter.Header().Set("Content-Type", "application/json")
+	writter.Write(payload)
+	return
+}
+
+//DeleteAutor : Metodo que elimina autores segun parametros
+func DeleteAutor(writter http.ResponseWriter, request *http.Request) {
+	var Autor models.Autor
+	err := json.NewDecoder(request.Body).Decode(&Autor)
+	jsonResponse := simplejson.New()
+	if err == nil {
+
+		AutorStrings, AutorValues := utilities.ObjectFields(Autor)
+
+		AutorDel, err := utilities.DeleteObject("Autor", AutorStrings, AutorValues)
+		if err == nil {
+
+			if AutorDel {
+
+				jsonResponse.Set("Exito", true)
+				jsonResponse.Set("Message", "Autor eliminado")
 
 			} else {
 

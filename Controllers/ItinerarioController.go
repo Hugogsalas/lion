@@ -148,6 +148,47 @@ func UpdateItinerario(writter http.ResponseWriter, request *http.Request) {
 	return
 }
 
+//DeleteItinerario : Metodo que elimina Itinerarios segun parametros
+func DeleteItinerario(writter http.ResponseWriter, request *http.Request) {
+	var Itinerario models.Itinerario
+	err := json.NewDecoder(request.Body).Decode(&Itinerario)
+	jsonResponse := simplejson.New()
+	if err == nil {
+
+		ItinerarioStrings, ItinerarioValues := utilities.ObjectFields(Itinerario)
+
+		ItinerarioDel, err := utilities.DeleteObject("Itinerario", ItinerarioStrings, ItinerarioValues)
+		if err == nil {
+
+			if ItinerarioDel {
+
+				jsonResponse.Set("Exito", true)
+				jsonResponse.Set("Message", "Itinerario eliminado")
+
+			} else {
+
+				jsonResponse.Set("Exito", false)
+				jsonResponse.Set("Message", err.Error())
+
+			}
+
+		} else {
+			jsonResponse.Set("Exito", false)
+			jsonResponse.Set("Message", err.Error())
+		}
+
+	} else {
+		jsonResponse.Set("Exito", false)
+		jsonResponse.Set("Message", err.Error())
+	}
+
+	payload, err := jsonResponse.MarshalJSON()
+	writter.Header().Set("Content-Type", "application/json")
+	writter.Write(payload)
+	return
+}
+
+
 //QueryToItinerario : Metodo que transforma la consulta a objetos Itinerario
 func QueryToItinerario(result *sql.Rows) ([]models.Itinerario, error) {
 	var itinerarioAux models.Itinerario
@@ -166,9 +207,9 @@ func QueryToItinerario(result *sql.Rows) ([]models.Itinerario, error) {
 func ItinerariosToInterfaces(Itinerarios []models.Itinerario) []interface{} {
 	var arrayInterface []interface{}
 	for i:=0;i<len(Itinerarios);i++{
-		var ExposicionInterface interface{}
-		ExposicionInterface=Itinerarios[i]
-		arrayInterface=append(arrayInterface,ExposicionInterface)
+		var ItinerarioInterface interface{}
+		ItinerarioInterface=Itinerarios[i]
+		arrayInterface=append(arrayInterface,ItinerarioInterface)
 	}
 	return arrayInterface
 }

@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/bitly/go-simplejson"
+	"github.com/mitchellh/mapstructure"
 
 	models "../Models"
 	utilities "../Utilities"
@@ -94,7 +95,91 @@ func GetSalaTaller(writter http.ResponseWriter, request *http.Request) {
 	return
 }
 
+//UpdateSalaTaller : Metodo que actualiza SalaTaller segun parametros
+func UpdateSalaTaller(writter http.ResponseWriter, request *http.Request) {
+	var lastSalaTaller models.SalaTaller
+	var newSalaTaller models.SalaTaller
+	var recipient map[string]interface{}
+	err := json.NewDecoder(request.Body).Decode(&recipient)
+	jsonResponse := simplejson.New()
+	if err == nil {
 
+		mapstructure.Decode(recipient["filter"], &lastSalaTaller)
+		mapstructure.Decode(recipient["update"], &newSalaTaller)
+
+		SalaTallerFilters,SalaTallerFiltersValues :=utilities.ObjectFields(lastSalaTaller)
+		SalaTallerStrings,SalaTallerValues := utilities.ObjectFields(newSalaTaller)
+
+		SalaTallerRows, err := utilities.UpdateObject("SalaTaller", SalaTallerFilters, SalaTallerFiltersValues, SalaTallerStrings, SalaTallerValues)
+		if err == nil {
+
+			if SalaTallerRows {
+
+				jsonResponse.Set("Exito", true)
+				jsonResponse.Set("Message", "SalaTaller actualizado")
+
+			} else {
+
+				jsonResponse.Set("Exito", false)
+				jsonResponse.Set("Message", err.Error())
+
+			}
+
+		} else {
+			jsonResponse.Set("Exito", false)
+			jsonResponse.Set("Message", err.Error())
+		}
+
+	} else {
+		jsonResponse.Set("Exito", false)
+		jsonResponse.Set("Message", err.Error())
+	}
+
+	payload, err := jsonResponse.MarshalJSON()
+	writter.Header().Set("Content-Type", "application/json")
+	writter.Write(payload)
+	return
+}
+
+//DeleteSalaTaller : Metodo que elimina SalaTalleres segun parametros
+func DeleteSalaTaller(writter http.ResponseWriter, request *http.Request) {
+	var SalaTaller models.SalaTaller
+	err := json.NewDecoder(request.Body).Decode(&SalaTaller)
+	jsonResponse := simplejson.New()
+	if err == nil {
+
+		SalaTallerStrings, SalaTallerValues := utilities.ObjectFields(SalaTaller)
+
+		SalaTallerDel, err := utilities.DeleteObject("SalaTaller", SalaTallerStrings, SalaTallerValues)
+		if err == nil {
+
+			if SalaTallerDel {
+
+				jsonResponse.Set("Exito", true)
+				jsonResponse.Set("Message", "SalaTaller eliminado")
+
+			} else {
+
+				jsonResponse.Set("Exito", false)
+				jsonResponse.Set("Message", err.Error())
+
+			}
+
+		} else {
+			jsonResponse.Set("Exito", false)
+			jsonResponse.Set("Message", err.Error())
+		}
+
+	} else {
+		jsonResponse.Set("Exito", false)
+		jsonResponse.Set("Message", err.Error())
+	}
+
+	payload, err := jsonResponse.MarshalJSON()
+	writter.Header().Set("Content-Type", "application/json")
+	writter.Write(payload)
+	return
+}
 
 //SalaWithTalleres : metodo que combierte una consulta a una relacion Sala con Talleres descritos
 func SalaWithTalleres(result *sql.Rows) ([]map[string]interface{}, error) {

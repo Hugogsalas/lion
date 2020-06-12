@@ -156,6 +156,47 @@ func UpdateEditorial(writter http.ResponseWriter, request *http.Request) {
 	return
 }
 
+//DeleteEditorial : Metodo que elimina Editoriales segun parametros
+func DeleteEditorial(writter http.ResponseWriter, request *http.Request) {
+	var Editorial models.Editorial
+	err := json.NewDecoder(request.Body).Decode(&Editorial)
+	jsonResponse := simplejson.New()
+	if err == nil {
+
+		EditorialStrings, EditorialValues := utilities.ObjectFields(Editorial)
+
+		EditorialDel, err := utilities.DeleteObject("Editorial", EditorialStrings, EditorialValues)
+		if err == nil {
+
+			if EditorialDel {
+
+				jsonResponse.Set("Exito", true)
+				jsonResponse.Set("Message", "Editorial eliminada")
+
+			} else {
+
+				jsonResponse.Set("Exito", false)
+				jsonResponse.Set("Message", err.Error())
+
+			}
+
+		} else {
+			jsonResponse.Set("Exito", false)
+			jsonResponse.Set("Message", err.Error())
+		}
+
+	} else {
+		jsonResponse.Set("Exito", false)
+		jsonResponse.Set("Message", err.Error())
+	}
+
+	payload, err := jsonResponse.MarshalJSON()
+	writter.Header().Set("Content-Type", "application/json")
+	writter.Write(payload)
+	return
+}
+
+
 //QueryToEditorial : Metodo que transforma la consulta a objetos Editorial
 func QueryToEditorial(result *sql.Rows) ([]models.Editorial, error) {
 	var editorialAux models.Editorial

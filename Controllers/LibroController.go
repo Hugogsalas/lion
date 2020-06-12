@@ -142,6 +142,46 @@ func UpdateLibro(writter http.ResponseWriter, request *http.Request) {
 	return
 }
 
+//DeleteLibro : Metodo que elimina Libros segun parametros
+func DeleteLibro(writter http.ResponseWriter, request *http.Request) {
+	var Libro models.Libro
+	err := json.NewDecoder(request.Body).Decode(&Libro)
+	jsonResponse := simplejson.New()
+	if err == nil {
+
+		LibroStrings, LibroValues := utilities.ObjectFields(Libro)
+
+		LibroDel, err := utilities.DeleteObject("Libro", LibroStrings, LibroValues)
+		if err == nil {
+
+			if LibroDel {
+
+				jsonResponse.Set("Exito", true)
+				jsonResponse.Set("Message", "Libro eliminado")
+
+			} else {
+
+				jsonResponse.Set("Exito", false)
+				jsonResponse.Set("Message", err.Error())
+
+			}
+
+		} else {
+			jsonResponse.Set("Exito", false)
+			jsonResponse.Set("Message", err.Error())
+		}
+
+	} else {
+		jsonResponse.Set("Exito", false)
+		jsonResponse.Set("Message", err.Error())
+	}
+
+	payload, err := jsonResponse.MarshalJSON()
+	writter.Header().Set("Content-Type", "application/json")
+	writter.Write(payload)
+	return
+}
+
 //QueryToLibro : Metodo que transforma la consulta a objetos Libro
 func QueryToLibro(result *sql.Rows) ([]models.Libro, error) {
 	var libroAux models.Libro

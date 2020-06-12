@@ -68,7 +68,7 @@ func GetEditorialLibro(writter http.ResponseWriter, request *http.Request) {
 			if err == nil {
 				if len(EditorialLibroResultado) > 0 {
 					jsonResponse.Set("Exito", true)
-					jsonResponse.Set("Message", "AutorLibro encontrado")
+					jsonResponse.Set("Message", "EditorialLibro encontrado")
 					jsonResponse.Set("EditorialLibro", EditorialLibroResultado)
 				} else {
 					jsonResponse.Set("Exito", false)
@@ -127,6 +127,46 @@ func UpdateEditorialLibro(writter http.ResponseWriter, request *http.Request) {
 
 				jsonResponse.Set("Exito", true)
 				jsonResponse.Set("Message", "EditorialLibro actualizado")
+
+			} else {
+
+				jsonResponse.Set("Exito", false)
+				jsonResponse.Set("Message", err.Error())
+
+			}
+
+		} else {
+			jsonResponse.Set("Exito", false)
+			jsonResponse.Set("Message", err.Error())
+		}
+
+	} else {
+		jsonResponse.Set("Exito", false)
+		jsonResponse.Set("Message", err.Error())
+	}
+
+	payload, err := jsonResponse.MarshalJSON()
+	writter.Header().Set("Content-Type", "application/json")
+	writter.Write(payload)
+	return
+}
+
+//DeleteEditorialLibro : Metodo que elimina EditorialLibro segun parametros
+func DeleteEditorialLibro(writter http.ResponseWriter, request *http.Request) {
+	var EditorialLibro models.EditorialLibro
+	err := json.NewDecoder(request.Body).Decode(&EditorialLibro)
+	jsonResponse := simplejson.New()
+	if err == nil {
+
+		EditorialLibroStrings, EditorialLibroValues := utilities.ObjectFields(EditorialLibro)
+
+		EditorialLibroDel, err := utilities.DeleteObject("EditorialLibro", EditorialLibroStrings, EditorialLibroValues)
+		if err == nil {
+
+			if EditorialLibroDel {
+
+				jsonResponse.Set("Exito", true)
+				jsonResponse.Set("Message", "EditorialLibro eliminado")
 
 			} else {
 

@@ -142,6 +142,47 @@ func UpdateAutorLibro(writter http.ResponseWriter, request *http.Request) {
 	return
 }
 
+//DeleteAutorLibro : Metodo que elimina AutorLibro segun parametros
+func DeleteAutorLibro(writter http.ResponseWriter, request *http.Request) {
+	var AutorLibro models.AutorLibro
+	err := json.NewDecoder(request.Body).Decode(&AutorLibro)
+	jsonResponse := simplejson.New()
+	if err == nil {
+
+		AutorLibroStrings, AutorLibroValues := utilities.ObjectFields(AutorLibro)
+
+		AutorLibroDel, err := utilities.DeleteObject("AutorLibro", AutorLibroStrings, AutorLibroValues)
+		if err == nil {
+
+			if AutorLibroDel {
+
+				jsonResponse.Set("Exito", true)
+				jsonResponse.Set("Message", "AutorLibro eliminado")
+
+			} else {
+
+				jsonResponse.Set("Exito", false)
+				jsonResponse.Set("Message", err.Error())
+
+			}
+
+		} else {
+			jsonResponse.Set("Exito", false)
+			jsonResponse.Set("Message", err.Error())
+		}
+
+	} else {
+		jsonResponse.Set("Exito", false)
+		jsonResponse.Set("Message", err.Error())
+	}
+
+	payload, err := jsonResponse.MarshalJSON()
+	writter.Header().Set("Content-Type", "application/json")
+	writter.Write(payload)
+	return
+}
+
+
 //LibrosWithAutores : metodo que combierte una consulta a una relacion Libro con autores descritos
 func LibrosWithAutores(result *sql.Rows) ([]map[string]interface{}, error) {
 	var LibroAux models.Libro
