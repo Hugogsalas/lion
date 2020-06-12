@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"encoding/json"
 	"net/http"
-	"fmt"
 	
 	"github.com/bitly/go-simplejson"
 
@@ -24,10 +23,7 @@ func CreateSello(writter http.ResponseWriter, request *http.Request) {
 		json.Set("Message", err.Error())
 	}
 
-	var SelloValues []interface{}
-	var SelloStrings []string
-	SelloValues = utilities.ObjectValues(Sello)
-	SelloStrings = utilities.ObjectFields(Sello)
+	SelloStrings,SelloValues := utilities.ObjectFields(Sello)
 
 	result, err := utilities.InsertObject("Sello", SelloValues, SelloStrings)
 	if err != nil {
@@ -59,25 +55,17 @@ func GetSello(writter http.ResponseWriter, request *http.Request) {
 
 	if err == nil {
 
-		var selloValues []interface{}
-		var selloStrings []string
-		selloValues = utilities.ObjectValues(Sello)
-		selloStrings = utilities.ObjectFields(Sello)
+		selloStrings,selloValues := utilities.ObjectFields(Sello)
 
-		fmt.Println(selloStrings)
-		fmt.Println(selloValues)
-		//Limpia de los atributos del objeto
-		if selloValues[0] == 0 {
-			selloValues[0] = nil
-		}
+		var SelloQuery models.GetQuery
+		
+		SelloQuery.Tables=[]string{"Sello"}
+		SelloQuery.Selects=nil
+		SelloQuery.Params=[][]string{selloStrings}
+		SelloQuery.Values=[][]interface{}{selloValues}
+		SelloQuery.Conditions=nil
 
-		for i := 1; i < len(selloStrings); i++ {
-			if selloValues[i] == "" {
-				selloValues[i] = nil
-			}
-		}
-
-		selloRows, err := utilities.GetObject([]string{"Sello"}, nil, selloStrings, selloValues)
+		selloRows, err := utilities.GetObject(SelloQuery)
 		if err == nil {
 			selloResultado, err := QueryToSello(selloRows)
 			if err == nil {
@@ -123,17 +111,9 @@ func UpdateSello(writter http.ResponseWriter, request *http.Request) {
 		SelloFilters = append(SelloFilters, "ID")
 		SelloFiltersValues = append(SelloFiltersValues, Sello.ID)
 
-		var SelloValues []interface{}
-		var SelloStrings []string
+		Sello.ID=0
 
-		SelloValues = utilities.ObjectValues(Sello)
-		SelloStrings = utilities.ObjectFields(Sello)
-
-		SelloValues[0] = nil
-
-		if SelloValues[1] == "" {
-			SelloValues[1] = nil
-		}
+		SelloStrings,SelloValues := utilities.ObjectFields(Sello)
 
 		SelloRows, err := utilities.UpdateObject("Sello", SelloFilters, SelloFiltersValues, SelloStrings, SelloValues)
 		if err == nil {
@@ -171,7 +151,10 @@ func QueryToSello(result *sql.Rows) ([]models.Sello, error) {
 	var selloAux models.Sello
 	var recipents []models.Sello
 	for result.Next() {
-		err := result.Scan(&selloAux.ID, &selloAux.Descripcion)
+		err := result.Scan(
+			&selloAux.ID,
+			&selloAux.IDEditorial, 
+			&selloAux.Descripcion)
 		if err != nil {
 			return nil, err
 		}

@@ -23,10 +23,7 @@ func CreateTiposTalleres(writter http.ResponseWriter, request *http.Request) {
 		json.Set("Message", err.Error())
 	}
 
-	var TiposTalleresValues []interface{}
-	var TiposTalleresStrings []string
-	TiposTalleresValues = utilities.ObjectValues(TiposTalleres)
-	TiposTalleresStrings = utilities.ObjectFields(TiposTalleres)
+	TiposTalleresStrings,TiposTalleresValues := utilities.ObjectFields(TiposTalleres)
 
 	result, err := utilities.InsertObject("TiposTalleres", TiposTalleresValues, TiposTalleresStrings)
 	if err != nil {
@@ -55,24 +52,17 @@ func GetTiposTalleres(writter http.ResponseWriter, request *http.Request) {
 	jsonResponse := simplejson.New()
 	if err == nil {
 
-		var TiposTalleresValues []interface{}
-		var TiposTalleresStrings []string
-		TiposTalleresValues = utilities.ObjectValues(TiposTalleres)
-		TiposTalleresStrings = utilities.ObjectFields(TiposTalleres)
+		TiposTalleresStrings,TiposTalleresValues := utilities.ObjectFields(TiposTalleres)
 
+		var TiposTalleresQuery models.GetQuery
+		
+		TiposTalleresQuery.Tables=[]string{"TiposTalleres"}
+		TiposTalleresQuery.Selects=nil
+		TiposTalleresQuery.Params=[][]string{TiposTalleresStrings}
+		TiposTalleresQuery.Values=[][]interface{}{TiposTalleresValues}
+		TiposTalleresQuery.Conditions=nil
 
-		//Limpia de los atributos del objeto
-		if TiposTalleresValues[0] == 0 {
-			TiposTalleresValues[0] = nil
-		}
-
-		for i := 1; i < len(TiposTalleresStrings); i++ {
-			if TiposTalleresValues[i] == "" {
-				TiposTalleresValues[i] = nil
-			}
-		}
-
-		TiposTalleresRows, err := utilities.GetObject([]string{"TiposTalleres"}, nil, TiposTalleresStrings, TiposTalleresValues)
+		TiposTalleresRows, err := utilities.GetObject(TiposTalleresQuery)
 		if err == nil {
 			TiposTalleresesResultado, err := QueryToTiposTalleres(TiposTalleresRows)
 			if err == nil {
@@ -118,17 +108,9 @@ func UpdateTiposTaller(writter http.ResponseWriter, request *http.Request) {
 		TiposTallerFilters = append(TiposTallerFilters, "ID")
 		TiposTallerFiltersValues = append(TiposTallerFiltersValues, TiposTaller.ID)
 
-		var TiposTallerValues []interface{}
-		var TiposTallerStrings []string
+		TiposTaller.ID=0
 
-		TiposTallerValues = utilities.ObjectValues(TiposTaller)
-		TiposTallerStrings = utilities.ObjectFields(TiposTaller)
-
-		TiposTallerValues[0] = nil
-
-		if TiposTallerValues[1] == "" {
-			TiposTallerValues[1] = nil
-		}
+		TiposTallerStrings,TiposTallerValues := utilities.ObjectFields(TiposTaller)
 
 		TiposTallerRows, err := utilities.UpdateObject("TiposTalleres", TiposTallerFilters, TiposTallerFiltersValues, TiposTallerStrings, TiposTallerValues)
 		if err == nil {

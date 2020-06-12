@@ -13,8 +13,8 @@ import (
 
 //CreateLibro : Metodo de insercion de un nuevo Libro
 func CreateLibro(writter http.ResponseWriter, request *http.Request) {
-	var libro models.Libro
-	err := json.NewDecoder(request.Body).Decode(&libro)
+	var Libro models.Libro
+	err := json.NewDecoder(request.Body).Decode(&Libro)
 
 	json := simplejson.New()
 	if err != nil {
@@ -22,12 +22,9 @@ func CreateLibro(writter http.ResponseWriter, request *http.Request) {
 		json.Set("Message", err.Error())
 	}
 
-	var libValues []interface{}
-	var libStrings []string
-	libValues = utilities.ObjectValues(libro)
-	libStrings = utilities.ObjectFields(libro)
+	LibroStrings,LibroValues := utilities.ObjectFields(Libro)
 
-	result, err := utilities.InsertObject("libro", libValues, libStrings)
+	result, err := utilities.InsertObject("Libro", LibroValues, LibroStrings)
 	if err != nil {
 		json.Set("Exito", false)
 		json.Set("Message", err.Error())
@@ -50,28 +47,22 @@ func CreateLibro(writter http.ResponseWriter, request *http.Request) {
 
 //GetLibro : Metodo que regresa libros segun parametros
 func GetLibro(writter http.ResponseWriter, request *http.Request) {
-	var libro models.Libro
-	err := json.NewDecoder(request.Body).Decode(&libro)
+	var Libro models.Libro
+	err := json.NewDecoder(request.Body).Decode(&Libro)
 	jsonResponse := simplejson.New()
 	if err == nil {
 
-		var libValues []interface{}
-		var libStrings []string
-		libValues = utilities.ObjectValues(libro)
-		libStrings = utilities.ObjectFields(libro)
+		LibroStrings,LibroValues := utilities.ObjectFields(Libro)
 
-		//Limpia de los atributos del objeto
-		if libValues[0] == 0 {
-			libValues[0] = nil
-		}
-		if libValues[1] == 0.0 {
-			libValues[1] = nil
-		}
-		if libValues[2] == "" {
-			libValues[2] = nil
-		}
+		var LibroQuery models.GetQuery
+		
+		LibroQuery.Tables=[]string{"Libro"}
+		LibroQuery.Selects=nil
+		LibroQuery.Params=[][]string{LibroStrings}
+		LibroQuery.Values=[][]interface{}{LibroValues}
+		LibroQuery.Conditions=nil
 
-		libRows, err := utilities.GetObject([]string{"Libro"}, nil, libStrings, libValues)
+		libRows, err := utilities.GetObject(LibroQuery)
 		if err == nil {
 			librosResultado, err := QueryToLibro(libRows)
 			
@@ -118,21 +109,7 @@ func UpdateLibro(writter http.ResponseWriter, request *http.Request) {
 		LibroFilters = append(LibroFilters, "ID")
 		LibroFiltersValues = append(LibroFiltersValues, Libro.ID)
 
-		var LibroValues []interface{}
-		var LibroStrings []string
-
-		LibroValues = utilities.ObjectValues(Libro)
-		LibroStrings = utilities.ObjectFields(Libro)
-
-		LibroValues[0] = nil
-
-		if LibroValues[1] == 0.0 {
-			LibroValues[1] = nil
-		}
-		if LibroValues[2] == "" {
-			LibroValues[2] = nil
-		}
-		
+		LibroStrings,LibroValues := utilities.ObjectFields(Libro)
 
 		LibroRows, err := utilities.UpdateObject("Libro", LibroFilters, LibroFiltersValues, LibroStrings, LibroValues)
 		if err == nil {

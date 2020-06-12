@@ -45,7 +45,9 @@ create table Itinerario(
 
 create table Sello(
     ID int primary key auto_increment not null,
-    Descripcion varchar (50) not null
+    IDEditorial int not null,
+    Descripcion varchar (50) not null,
+    FOREIGN KEY (IDEditorial) REFERENCES Editorial(ID) ON DELETE CASCADE
 );
 
 create table Libro(

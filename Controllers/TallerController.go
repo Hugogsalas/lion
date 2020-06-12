@@ -23,10 +23,7 @@ func CreateTaller(writter http.ResponseWriter, request *http.Request) {
 		json.Set("Message", err.Error())
 	}
 
-	var TallerValues []interface{}
-	var TallerStrings []string
-	TallerValues = utilities.ObjectValues(Taller)
-	TallerStrings = utilities.ObjectFields(Taller)
+	TallerStrings,TallerValues := utilities.ObjectFields(Taller)
 
 	result, err := utilities.InsertObject("Taller", TallerValues, TallerStrings)
 	if err != nil {
@@ -59,27 +56,17 @@ func GetTaller(writter http.ResponseWriter, request *http.Request) {
 	jsonResponse := simplejson.New()
 	if err == nil {
 
-		var TallerValues []interface{}
-		var TallerStrings []string
-		TallerValues = utilities.ObjectValues(Taller)
-		TallerStrings = utilities.ObjectFields(Taller)
-
-
-		//Limpia de los atributos del objeto
-		for i := 0; i < 3 ; i++ {
-			if TallerValues[i] == 0 {
-				TallerValues[i] = nil
-			}
-		}
+		TallerStrings,TallerValues := utilities.ObjectFields(Taller)
 		
+		var TallerQuery models.GetQuery
+		
+		TallerQuery.Tables=[]string{"Taller"}
+		TallerQuery.Selects=nil
+		TallerQuery.Params=[][]string{TallerStrings}
+		TallerQuery.Values=[][]interface{}{TallerValues}
+		TallerQuery.Conditions=nil
 
-		for i := 3; i < len(TallerStrings); i++ {
-			if TallerValues[i] == "" {
-				TallerValues[i] = nil
-			}
-		}
-
-		TallerRows, err := utilities.GetObject([]string{"Taller"}, nil, TallerStrings, TallerValues)
+		TallerRows, err := utilities.GetObject(TallerQuery)
 		if err == nil {
 			TalleresResultado, err := QueryToTaller(TallerRows)
 			if err == nil {
@@ -125,27 +112,9 @@ func UpdateTaller(writter http.ResponseWriter, request *http.Request) {
 		TallerFilters = append(TallerFilters, "ID")
 		TallerFiltersValues = append(TallerFiltersValues, Taller.ID)
 
-		var TallerValues []interface{}
-		var TallerStrings []string
-
-		TallerValues = utilities.ObjectValues(Taller)
-		TallerStrings = utilities.ObjectFields(Taller)
-
-		TallerValues[0] = nil
-
-		for i := 1; i < 3 ; i++ {
-			if TallerValues[i] == 0 {
-				TallerValues[i] = nil
-			}
-		}
+		Taller.ID=0
 		
-
-		for i := 3; i < len(TallerStrings); i++ {
-			if TallerValues[i] == "" {
-				TallerValues[i] = nil
-			}
-		}
-
+		TallerStrings,TallerValues := utilities.ObjectFields(Taller)
 
 		TallerRows, err := utilities.UpdateObject("Taller", TallerFilters, TallerFiltersValues, TallerStrings, TallerValues)
 		if err == nil {

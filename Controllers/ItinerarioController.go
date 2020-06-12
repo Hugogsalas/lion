@@ -22,11 +22,8 @@ func CreateItinerario(writter http.ResponseWriter, request *http.Request) {
 		json.Set("Exito", false)
 		json.Set("Message", err.Error())
 	}
-
-	var itinerarioValues []interface{}
-	var itinerarioStrings []string
-	itinerarioValues = utilities.ObjectValues(itinerario)
-	itinerarioStrings = utilities.ObjectFields(itinerario)
+	
+	itinerarioStrings,itinerarioValues := utilities.ObjectFields(itinerario)
 
 	result, err := utilities.InsertObject("itinerario", itinerarioValues, itinerarioStrings)
 	if err != nil {
@@ -56,27 +53,17 @@ func GetItinerario(writter http.ResponseWriter, request *http.Request) {
 	jsonResponse := simplejson.New()
 	if err == nil {
 
-		var itinValues []interface{}
-		var itinStrings []string
-		itinValues = utilities.ObjectValues(itinerario)
-		itinStrings = utilities.ObjectFields(itinerario)
+		itinerarioStrings,itinerarioValues := utilities.ObjectFields(itinerario)
 
-		fmt.Println(itinStrings)
-		fmt.Println(itinValues)
+		var itinerarioQuery models.GetQuery
+		
+		itinerarioQuery.Tables=[]string{"itinerario"}
+		itinerarioQuery.Selects=nil
+		itinerarioQuery.Params=[][]string{itinerarioStrings}
+		itinerarioQuery.Values=[][]interface{}{itinerarioValues}
+		itinerarioQuery.Conditions=nil
 
-		//Limpia de los atributos del objeto
-		
-		if itinValues[0] == 0{
-			itinValues[0] = nil
-		}
-		
-		if itinValues[1] == "" {
-			itinValues[1] = nil
-		}
-		
-	
-
-		itinRows, err := utilities.GetObject([]string{"itinerario"}, nil, itinStrings, itinValues)
+		itinRows, err := utilities.GetObject(itinerarioQuery)
 		if err == nil {
 			itinerariosResultado, err := QueryToItinerario(itinRows)
 			fmt.Println(itinerariosResultado)
@@ -122,18 +109,12 @@ func UpdateItinerario(writter http.ResponseWriter, request *http.Request) {
 
 		ItinerarioFilters = append(ItinerarioFilters, "ID")
 		ItinerarioFiltersValues = append(ItinerarioFiltersValues, Itinerario.ID)
+		
+		Itinerario.ID = 0
 
-		var ItinerarioValues []interface{}
-		var ItinerarioStrings []string
+		ItinerarioStrings,ItinerarioValues := utilities.ObjectFields(Itinerario)
 
-		ItinerarioValues = utilities.ObjectValues(Itinerario)
-		ItinerarioStrings = utilities.ObjectFields(Itinerario)
 
-		ItinerarioValues[0] = nil
-
-		if ItinerarioValues[1] == "" {
-			ItinerarioValues[1] = nil
-		}
 		
 
 		ItinerarioRows, err := utilities.UpdateObject("Itinerario", ItinerarioFilters, ItinerarioFiltersValues, ItinerarioStrings, ItinerarioValues)

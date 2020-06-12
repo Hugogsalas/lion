@@ -4,11 +4,13 @@ import (
 	"database/sql"
 	"fmt"
 
+	models "../Models"
 	_ "github.com/go-sql-driver/mysql"
 )
 
 //ExecuteCommand : Metodo de execucion de un query que no retorna nada
 func ExecuteCommand(command string) (interface{}, error) {
+	fmt.Println(command)
 	db, err := sql.Open("mysql", "root:3$trella@tcp(127.0.0.1:3306)/lioness")
 	if err != nil {
 		return nil, err
@@ -23,6 +25,7 @@ func ExecuteCommand(command string) (interface{}, error) {
 
 //ExecuteQuery : Metodo de execucion de un query que retorna objetos
 func ExecuteQuery(command string) (*sql.Rows, error) {
+	fmt.Println(command)
 	db, err := sql.Open("mysql", "root:3$trella@tcp(127.0.0.1:3306)/lioness")
 	if err != nil {
 		return nil, err
@@ -53,9 +56,13 @@ func InsertObject(table string, values []interface{}, fields []string) (bool, er
 		var valueString string = fmt.Sprintf("%v", values[i])
 		var typeVar string = fmt.Sprintf("%T", values[i])
 		if typeVar != "string" {
-			command += valueString
+			if valueString == "<nil>"{
+				command += "null"
+			} else {
+				command += valueString
+			}
 		} else {
-			if valueString == "" {
+			if valueString == ""{
 				command += "null"
 			} else {
 				command += "'" + valueString + "'"
@@ -80,56 +87,66 @@ func InsertObject(table string, values []interface{}, fields []string) (bool, er
 }
 
 //GetObject : metodo que retorna un objeto segun parametros
-func GetObject(table []string, selects []string, params []string, values []interface{}) (*sql.Rows, error) {
+func GetObject(Query models.GetQuery) (*sql.Rows, error) {
 	var command string
 
 	command += "SELECT "
-	if len(selects) == 0 {
+	if len(Query.Selects) == 0 {
 		command += "* "
 	} else {
-		for i := 0; i < len(selects); i++ {
-			if values[i] != nil {
-				if i == (len(selects) - 1) {
-					command += selects[i] + ","
-				} else {
-					command += selects[i]
+		for i := 0; i < len(Query.Selects); i++ {
+			for j := 0; j < len(Query.Selects[i]); j++ {
+				if Query.Selects[i][j] != "" {
+					if i == (len(Query.Selects) - 1) && j == (len(Query.Selects[i]) - 1){
+						command += Query.Tables[i] + "." + Query.Selects[i][j]
+					} else {
+						command += Query.Tables[i] + "." + Query.Selects[i][j] + ","
+					}
 				}
 			}
 		}
 	}
 
 	command += " FROM "
-	for i := 0; i < len(table); i++ {
-		if i == (len(selects) - 1) {
-			command += table[i] + ","
+	for i := 0; i < len(Query.Tables); i++ {
+		if i == (len(Query.Tables)-1) {
+			command += Query.Tables[i]
 		} else {
-			command += table[i]
+			command += Query.Tables[i] + ","
 		}
 	}
 
 	where := false
 
-	multiple := false
-
-	for i := 0; i < len(values); i++ {
-		if values[i] != nil {
-			if where == false {
-				command += " WHERE "
-				where = true
+	for i := 0; i < len(Query.Values); i++ {
+		for j := 0; j < len(Query.Values[i]); j++ {
+			if Query.Values[i][j] != nil {
+				if !where {
+					command += " WHERE "
+					where = true
+				} else {
+					command += " AND "
+				}
+				var varType string = fmt.Sprintf("%T", Query.Values[i][j])
+				var varString string = fmt.Sprintf("%v", Query.Values[i][j])
+				if varType != "string" {
+					command += Query.Tables[i]+"."+Query.Params[i][j] + "=" + varString
+				} else {
+					command += Query.Tables[i]+"."+Query.Params[i][j] + "='" + varString + "'"
+				}
 			}
-			if multiple {
-				command += " AND "
-			}
-			var varType string = fmt.Sprintf("%T", values[i])
-			var varString string = fmt.Sprintf("%v", values[i])
-			if varType != "string" {
-				command += params[i] + "=" + varString
-			} else {
-				command += params[i] + "='" + varString + "'"
-			}
-			multiple = true
 		}
 	}
+
+	for i := 0; i < len(Query.Conditions); i++ {
+		if i == 1 && !where {
+			command += " WHERE "
+		} else {
+			command += " AND "
+		}
+		command += Query.Conditions[i]
+	}
+
 	result, err := ExecuteQuery(command)
 
 	if err != nil {
@@ -183,7 +200,7 @@ func UpdateObject(table string, selects []string, filters []interface{}, params 
 			}
 		}
 	}
-	fmt.Println(command)
+	
 	result, err := ExecuteQuery(command)
 
 	if err != nil {

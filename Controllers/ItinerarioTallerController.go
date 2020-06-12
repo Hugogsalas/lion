@@ -23,10 +23,7 @@ func CreateItinerarioTaller(writter http.ResponseWriter, request *http.Request) 
 		json.Set("Message", err.Error())
 	}
 
-	var itinerarioTallerValues []interface{}
-	var itinerarioTallerStrings []string
-	itinerarioTallerValues = utilities.ObjectValues(itinerarioTaller)
-	itinerarioTallerStrings = utilities.ObjectFields(itinerarioTaller)
+	itinerarioTallerStrings,itinerarioTallerValues := utilities.ObjectFields(itinerarioTaller)
 
 	result, err := utilities.InsertObject("ItinerarioTaller", itinerarioTallerValues, itinerarioTallerStrings)
 	if err != nil {
@@ -118,32 +115,9 @@ func UpdateItinerarioTaller(writter http.ResponseWriter, request *http.Request) 
 		mapstructure.Decode(recipient["filter"], &lastItinerarioTaller)
 		mapstructure.Decode(recipient["update"], &newItinerarioTaller)
 
-		var ItinerarioTallerFiltersValues []interface{}
-		var ItinerarioTallerFilters []string
+		ItinerarioTallerFilters,ItinerarioTallerFiltersValues :=utilities.ObjectFields(lastItinerarioTaller)
 
-		ItinerarioTallerFiltersValues =utilities.ObjectValues(lastItinerarioTaller)
-		ItinerarioTallerFilters =utilities.ObjectFields(lastItinerarioTaller)
-
-		var ItinerarioTallerValues []interface{}
-		var ItinerarioTallerStrings []string
-
-		ItinerarioTallerValues = utilities.ObjectValues(newItinerarioTaller)
-		ItinerarioTallerStrings = utilities.ObjectFields(newItinerarioTaller)
-
-		for i:=1;i<2;i++{
-			if ItinerarioTallerValues[i] == 0 {
-				ItinerarioTallerValues[i] = nil
-			}
-			if ItinerarioTallerFiltersValues[i] == 0 {
-				ItinerarioTallerFiltersValues[i] = nil
-			}
-		}
-		if ItinerarioTallerValues[2] == "" {
-			ItinerarioTallerValues[2] = nil
-		}
-		if ItinerarioTallerFiltersValues[2] == "" {
-			ItinerarioTallerFiltersValues[2] = nil
-		}
+		ItinerarioTallerStrings,ItinerarioTallerValues := utilities.ObjectFields(newItinerarioTaller)
 
 		ItinerarioTallerRows, err := utilities.UpdateObject("ItinerarioTaller", ItinerarioTallerFilters, ItinerarioTallerFiltersValues, ItinerarioTallerStrings, ItinerarioTallerValues)
 		if err == nil {

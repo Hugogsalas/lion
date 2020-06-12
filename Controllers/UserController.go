@@ -28,10 +28,7 @@ func CreateUser(writter http.ResponseWriter, request *http.Request) {
 		json.Set("Message", err.Error())
 	}
 
-	var userValues []interface{}
-	var useStrings []string
-	userValues = utilities.ObjectValues(usuario)
-	useStrings = utilities.ObjectFields(usuario)
+	useStrings,userValues := utilities.ObjectFields(usuario)
 
 	result, err := utilities.InsertObject("Usuarios", userValues, useStrings)
 	if err != nil {
@@ -76,24 +73,32 @@ func LoginUser(writter http.ResponseWriter, request *http.Request) {
 				userValues = append(userValues, usuario.Correo)
 				userValues = append(userValues, usuario.Clave)
 
-				UserRow, err := utilities.GetObject([]string{"Usuarios"}, nil, userStrings, userValues)
+				var UserQuery models.GetQuery
+
+				UserQuery.Tables = []string{"Usuarios"}
+				UserQuery.Selects = nil
+				UserQuery.Params = [][]string{userStrings}
+				UserQuery.Values = [][]interface{}{userValues}
+				UserQuery.Conditions = nil
+
+				UserRow, err := utilities.GetObject(UserQuery)
 
 				if err == nil {
 					UserList, err := QueryToUser(UserRow)
 
-					if len(UserList)>0{
+					if len(UserList) > 0 {
 						if err == nil {
 							jsonResponse.Set("Exito", true)
 							jsonResponse.Set("Message", "Usuario obtenido")
 							jsonResponse.Set("Usuario", UserList[0])
-	
+
 						} else {
 							jsonResponse.Set("Exito", false)
 							jsonResponse.Set("Message", err.Error())
-	
+
 						}
-						
-					}else{
+
+					} else {
 						jsonResponse.Set("Exito", false)
 						jsonResponse.Set("Message", "Correo o clave erroneo")
 					}

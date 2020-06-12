@@ -23,10 +23,7 @@ func CreateStan(writter http.ResponseWriter, request *http.Request) {
 		json.Set("Message", err.Error())
 	}
 
-	var StanValues []interface{}
-	var StanStrings []string
-	StanValues = utilities.ObjectValues(Stan)
-	StanStrings = utilities.ObjectFields(Stan)
+	StanStrings, StanValues := utilities.ObjectFields(Stan)
 
 	result, err := utilities.InsertObject("Stan", StanValues, StanStrings)
 	if err != nil {
@@ -56,20 +53,17 @@ func GetStan(writter http.ResponseWriter, request *http.Request) {
 	jsonResponse := simplejson.New()
 	if err == nil {
 
-		var StanValues []interface{}
-		var StanStrings []string
-		StanValues = utilities.ObjectValues(Stan)
-		StanStrings = utilities.ObjectFields(Stan)
+		StanStrings, StanValues := utilities.ObjectFields(Stan)
 
-		//Limpia de los atributos del objeto
+		var StanQuery models.GetQuery
 
-		for i := 0; i < 3; i++ {
-			if StanValues[i] == 0 {
-				StanValues[i] = nil
-			}
-		}
+		StanQuery.Tables = []string{"Stan"}
+		StanQuery.Selects = nil
+		StanQuery.Params = [][]string{StanStrings}
+		StanQuery.Values = [][]interface{}{StanValues}
+		StanQuery.Conditions = nil
 
-		StanRows, err := utilities.GetObject([]string{"Stan"}, nil, StanStrings, StanValues)
+		StanRows, err := utilities.GetObject(StanQuery)
 		if err == nil {
 			StanesResultado, err := QueryToStan(StanRows)
 			if err == nil {
@@ -110,35 +104,42 @@ func GetStanWithEditorial(writter http.ResponseWriter, request *http.Request) {
 	if err == nil {
 
 		var StanValues []interface{}
-		StanValues = utilities.ObjectValues(Stan)
+		var StanStrings []string
+		StanStrings, StanValues = utilities.ObjectFields(Stan)
 
-		StanRows, err := utilities.CallStorageProcedure("PAStanEditoriales", StanValues)
+		if StanStrings != nil {
 
-		var StanesResultado []map[string]interface{}
+			StanRows, err := utilities.CallStorageProcedure("PAStanEditoriales", StanValues)
 
-		if err == nil {
-			if Stan.ID != 0 || Stan.Numero != 0{
-				StanesResultado, err = StanWithEditorial(StanRows)
-			} else {
-				StanesResultado, err = EditorialwithStans(StanRows)
-			}
+			var StanesResultado []map[string]interface{}
+
 			if err == nil {
-				if len(StanesResultado) > 0 {
-					jsonResponse.Set("Exito", true)
-					jsonResponse.Set("Message", "Stans encontrados")
-					jsonResponse.Set("Stans", StanesResultado)
+				if Stan.ID != 0 || Stan.Numero != 0 {
+					StanesResultado, err = StanWithEditorial(StanRows)
+				} else {
+					StanesResultado, err = EditorialwithStans(StanRows)
+				}
+				if err == nil {
+					if len(StanesResultado) > 0 {
+						jsonResponse.Set("Exito", true)
+						jsonResponse.Set("Message", "Stans encontrados")
+						jsonResponse.Set("Stans", StanesResultado)
+					} else {
+						jsonResponse.Set("Exito", false)
+						jsonResponse.Set("Message", "No se encontraron Stans")
+					}
 				} else {
 					jsonResponse.Set("Exito", false)
-					jsonResponse.Set("Message", "No se encontraron Stans")
+					jsonResponse.Set("Message", err.Error())
 				}
+
 			} else {
 				jsonResponse.Set("Exito", false)
 				jsonResponse.Set("Message", err.Error())
 			}
-
 		} else {
 			jsonResponse.Set("Exito", false)
-			jsonResponse.Set("Message", err.Error())
+			jsonResponse.Set("Message", "Easter egg muy raro")
 		}
 
 	} else {
@@ -165,19 +166,9 @@ func UpdateStan(writter http.ResponseWriter, request *http.Request) {
 		StanFilters = append(StanFilters, "ID")
 		StanFiltersValues = append(StanFiltersValues, Stan.ID)
 
-		var StanValues []interface{}
-		var StanStrings []string
+		Stan.ID = 0
 
-		StanValues = utilities.ObjectValues(Stan)
-		StanStrings = utilities.ObjectFields(Stan)
-
-		StanValues[0] = nil
-
-		for i := 1; i < 3; i++ {
-			if StanValues[i] == 0 {
-				StanValues[i] = nil
-			}
-		}
+		StanStrings, StanValues := utilities.ObjectFields(Stan)
 
 		StanRows, err := utilities.UpdateObject("Stan", StanFilters, StanFiltersValues, StanStrings, StanValues)
 		if err == nil {

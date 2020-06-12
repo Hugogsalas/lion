@@ -4,9 +4,9 @@ import (
 	"database/sql"
 	"encoding/json"
 	"net/http"
-	
-	"github.com/mitchellh/mapstructure"
+
 	"github.com/bitly/go-simplejson"
+	"github.com/mitchellh/mapstructure"
 
 	models "../Models"
 	utilities "../Utilities"
@@ -24,10 +24,7 @@ func CreateAutorLibro(writter http.ResponseWriter, request *http.Request) {
 		json.Set("Message", err.Error())
 	}
 
-	var AutorLibroValues []interface{}
-	var AutorLibroStrings []string
-	AutorLibroValues = utilities.ObjectValues(AutorLibro)
-	AutorLibroStrings = utilities.ObjectFields(AutorLibro)
+	AutorLibroStrings, AutorLibroValues := utilities.ObjectFields(AutorLibro)
 
 	result, err := utilities.InsertObject("AutorLibro", AutorLibroValues, AutorLibroStrings)
 	if err != nil {
@@ -110,26 +107,9 @@ func UpdateAutorLibro(writter http.ResponseWriter, request *http.Request) {
 		mapstructure.Decode(recipient["filter"], &lastAutorLibro)
 		mapstructure.Decode(recipient["update"], &newAutorLibro)
 
-		var AutorLibroFiltersValues []interface{}
-		var AutorLibroFilters []string
+		AutorLibroFilters, AutorLibroFiltersValues := utilities.ObjectFields(lastAutorLibro)
+		AutorLibroStrings,AutorLibroValues := utilities.ObjectFields(newAutorLibro)
 
-		AutorLibroFiltersValues =utilities.ObjectValues(lastAutorLibro)
-		AutorLibroFilters =utilities.ObjectFields(lastAutorLibro)
-
-		var AutorLibroValues []interface{}
-		var AutorLibroStrings []string
-
-		AutorLibroValues = utilities.ObjectValues(newAutorLibro)
-		AutorLibroStrings = utilities.ObjectFields(newAutorLibro)
-
-		for i:=0;i<len(AutorLibroValues);i++{
-			if AutorLibroValues[i] == 0 {
-				AutorLibroValues[i] = nil
-			}
-			if AutorLibroFiltersValues[i] == 0 {
-				AutorLibroFiltersValues[i] = nil
-			}
-		}
 
 		AutorLibroRows, err := utilities.UpdateObject("AutorLibro", AutorLibroFilters, AutorLibroFiltersValues, AutorLibroStrings, AutorLibroValues)
 		if err == nil {
@@ -181,21 +161,21 @@ func LibrosWithAutores(result *sql.Rows) ([]map[string]interface{}, error) {
 		if err != nil {
 			return nil, err
 		}
-			
-		index:=utilities.Ιndexof(LibrosToInterfaces(Libros),LibroAux)
-		if index==-1{
-			Libros=append(Libros,LibroAux)
-			newLibroInfo:=map[string]interface{}{
-				"id":LibroAux.ID,
-				"titulo":LibroAux.Titulo,
-				"precio":LibroAux.Precio,
-				"Autores":[]models.Autor{AutorAux},
+
+		index := utilities.Ιndexof(LibrosToInterfaces(Libros), LibroAux)
+		if index == -1 {
+			Libros = append(Libros, LibroAux)
+			newLibroInfo := map[string]interface{}{
+				"id":      LibroAux.ID,
+				"titulo":  LibroAux.Titulo,
+				"precio":  LibroAux.Precio,
+				"Autores": []models.Autor{AutorAux},
 			}
-			response=append(response,newLibroInfo)
-		}else{
+			response = append(response, newLibroInfo)
+		} else {
 			var lastAutors []models.Autor
-			lastAutors=response[index]["Autores"].([]models.Autor)
-			response[index]["Autores"]=append(lastAutors,AutorAux)
+			lastAutors = response[index]["Autores"].([]models.Autor)
+			response[index]["Autores"] = append(lastAutors, AutorAux)
 		}
 	}
 	return response, nil
@@ -219,26 +199,23 @@ func AutoresWithLibros(result *sql.Rows) ([]map[string]interface{}, error) {
 		if err != nil {
 			return nil, err
 		}
-			
-		index:=utilities.Ιndexof(AutoresToInterfaces(Autores),AutorAux)
-		if index==-1{
-			Autores=append(Autores,AutorAux)
-			newAutorInfo:=map[string]interface{}{
-				"id":AutorAux.ID,
-				"nombre":AutorAux.Nombre,
-				"apellidoPaterno":AutorAux.ApellidoPaterno,
-				"apellidoMaterno":AutorAux.ApellidoMaterno,
-				"Libros":[]models.Libro{LibroAux},
+
+		index := utilities.Ιndexof(AutoresToInterfaces(Autores), AutorAux)
+		if index == -1 {
+			Autores = append(Autores, AutorAux)
+			newAutorInfo := map[string]interface{}{
+				"id":              AutorAux.ID,
+				"nombre":          AutorAux.Nombre,
+				"apellidoPaterno": AutorAux.ApellidoPaterno,
+				"apellidoMaterno": AutorAux.ApellidoMaterno,
+				"Libros":          []models.Libro{LibroAux},
 			}
-			response=append(response,newAutorInfo)
-		}else{
+			response = append(response, newAutorInfo)
+		} else {
 			var lastLibros []models.Libro
-			lastLibros=response[index]["Libros"].([]models.Libro)
-			response[index]["Libros"]=append(lastLibros,LibroAux)
+			lastLibros = response[index]["Libros"].([]models.Libro)
+			response[index]["Libros"] = append(lastLibros, LibroAux)
 		}
 	}
 	return response, nil
 }
-
-
-

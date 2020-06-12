@@ -24,10 +24,7 @@ func CreateEditorialLibro(writter http.ResponseWriter, request *http.Request) {
 		json.Set("Message", err.Error())
 	}
 
-	var EditorialLibroValues []interface{}
-	var EditorialLibroStrings []string
-	EditorialLibroValues = utilities.ObjectValues(EditorialLibro)
-	EditorialLibroStrings = utilities.ObjectFields(EditorialLibro)
+	EditorialLibroStrings,EditorialLibroValues := utilities.ObjectFields(EditorialLibro)
 
 	result, err := utilities.InsertObject("EditorialLibro", EditorialLibroValues, EditorialLibroStrings)
 	if err != nil {
@@ -110,17 +107,9 @@ func UpdateEditorialLibro(writter http.ResponseWriter, request *http.Request) {
 		mapstructure.Decode(recipient["filter"], &lastEditorialLibro)
 		mapstructure.Decode(recipient["update"], &newEditorialLibro)
 
-		var EditorialLibroFiltersValues []interface{}
-		var EditorialLibroFilters []string
+		EditorialLibroFilters,EditorialLibroFiltersValues :=utilities.ObjectFields(lastEditorialLibro)
 
-		EditorialLibroFiltersValues =utilities.ObjectValues(lastEditorialLibro)
-		EditorialLibroFilters =utilities.ObjectFields(lastEditorialLibro)
-
-		var EditorialLibroValues []interface{}
-		var EditorialLibroStrings []string
-
-		EditorialLibroValues = utilities.ObjectValues(newEditorialLibro)
-		EditorialLibroStrings = utilities.ObjectFields(newEditorialLibro)
+		EditorialLibroStrings,EditorialLibroValues := utilities.ObjectFields(newEditorialLibro)
 
 		for i:=0;i<len(EditorialLibroValues);i++{
 			if EditorialLibroValues[i] == 0 {

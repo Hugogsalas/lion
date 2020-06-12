@@ -22,11 +22,7 @@ func CreateSalaTaller(writter http.ResponseWriter, request *http.Request) {
 		json.Set("Exito", false)
 		json.Set("Message", err.Error())
 	}
-
-	var SalaTallerValues []interface{}
-	var SalaTallerStrings []string
-	SalaTallerValues = utilities.ObjectValues(SalaTaller)
-	SalaTallerStrings = utilities.ObjectFields(SalaTaller)
+	SalaTallerStrings,SalaTallerValues := utilities.ObjectFields(SalaTaller)
 
 	result, err := utilities.InsertObject("SalaTaller", SalaTallerValues, SalaTallerStrings)
 	if err != nil {
@@ -97,6 +93,8 @@ func GetSalaTaller(writter http.ResponseWriter, request *http.Request) {
 	writter.Write(payload)
 	return
 }
+
+
 
 //SalaWithTalleres : metodo que combierte una consulta a una relacion Sala con Talleres descritos
 func SalaWithTalleres(result *sql.Rows) ([]map[string]interface{}, error) {

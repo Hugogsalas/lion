@@ -22,10 +22,7 @@ func CreateAutor(writter http.ResponseWriter, request *http.Request) {
 		json.Set("Message", err.Error())
 	}
 
-	var autorValues []interface{}
-	var autorStrings []string
-	autorValues = utilities.ObjectValues(autor)
-	autorStrings = utilities.ObjectFields(autor)
+	autorStrings, autorValues := utilities.ObjectFields(autor)
 
 	result, err := utilities.InsertObject("autor", autorValues, autorStrings)
 	if err != nil {
@@ -55,23 +52,17 @@ func GetAutor(writter http.ResponseWriter, request *http.Request) {
 	jsonResponse := simplejson.New()
 	if err == nil {
 
-		var autorValues []interface{}
-		var autorStrings []string
-		autorValues = utilities.ObjectValues(autor)
-		autorStrings = utilities.ObjectFields(autor)
+		autorStrings, autorValues := utilities.ObjectFields(autor)
 
-		//Limpia de los atributos del objeto
-		if autorValues[0] == 0 {
-			autorValues[0] = nil
-		}
+		var autorQuery models.GetQuery
 
-		for i := 1; i < len(autorStrings); i++ {
-			if autorValues[i] == "" {
-				autorValues[i] = nil
-			}
-		}
+		autorQuery.Tables = []string{"Autor"}
+		autorQuery.Selects = nil
+		autorQuery.Params = [][]string{autorStrings}
+		autorQuery.Values = [][]interface{}{autorValues}
+		autorQuery.Conditions = nil
 
-		autorRows, err := utilities.GetObject([]string{"Autor"}, nil, autorStrings, autorValues)
+		autorRows, err := utilities.GetObject(autorQuery)
 		if err == nil {
 			autoresResultado, err := QueryToAutor(autorRows)
 			if err == nil {
@@ -117,19 +108,9 @@ func UpdateAutor(writter http.ResponseWriter, request *http.Request) {
 		autorFilters = append(autorFilters, "ID")
 		autorFiltersValues = append(autorFiltersValues, autor.ID)
 
-		var autorValues []interface{}
-		var autorStrings []string
+		autor.ID=0
 
-		autorValues = utilities.ObjectValues(autor)
-		autorStrings = utilities.ObjectFields(autor)
-
-		autorValues[0] = nil
-
-		for i := 1; i < len(autorStrings); i++ {
-			if autorValues[i] == "" {
-				autorValues[i] = nil
-			}
-		}
+		autorStrings, autorValues := utilities.ObjectFields(autor)
 
 		autorRows, err := utilities.UpdateObject("Autor", autorFilters, autorFiltersValues, autorStrings, autorValues)
 		if err == nil {
@@ -143,7 +124,7 @@ func UpdateAutor(writter http.ResponseWriter, request *http.Request) {
 
 				jsonResponse.Set("Exito", false)
 				jsonResponse.Set("Message", err.Error())
-				
+
 			}
 
 		} else {

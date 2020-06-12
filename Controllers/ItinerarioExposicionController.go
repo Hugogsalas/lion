@@ -23,10 +23,7 @@ func CreateItinerarioExposicion(writter http.ResponseWriter, request *http.Reque
 		json.Set("Message", err.Error())
 	}
 
-	var itinerarioExposicionValues []interface{}
-	var itinerarioExposicionStrings []string
-	itinerarioExposicionValues = utilities.ObjectValues(itinerarioExposicion)
-	itinerarioExposicionStrings = utilities.ObjectFields(itinerarioExposicion)
+	itinerarioExposicionStrings,itinerarioExposicionValues := utilities.ObjectFields(itinerarioExposicion)
 
 	result, err := utilities.InsertObject("itinerarioExposicion", itinerarioExposicionValues, itinerarioExposicionStrings)
 	if err != nil {
@@ -117,32 +114,8 @@ func UpdateItinerarioExposicion(writter http.ResponseWriter, request *http.Reque
 		mapstructure.Decode(recipient["filter"], &lastItinerarioExposicion)
 		mapstructure.Decode(recipient["update"], &newItinerarioExposicion)
 
-		var ItinerarioExposicionFiltersValues []interface{}
-		var ItinerarioExposicionFilters []string
-
-		ItinerarioExposicionFiltersValues =utilities.ObjectValues(lastItinerarioExposicion)
-		ItinerarioExposicionFilters =utilities.ObjectFields(lastItinerarioExposicion)
-
-		var ItinerarioExposicionValues []interface{}
-		var ItinerarioExposicionStrings []string
-
-		ItinerarioExposicionValues = utilities.ObjectValues(newItinerarioExposicion)
-		ItinerarioExposicionStrings = utilities.ObjectFields(newItinerarioExposicion)
-
-		for i:=1;i<2;i++{
-			if ItinerarioExposicionValues[i] == 0 {
-				ItinerarioExposicionValues[i] = nil
-			}
-			if ItinerarioExposicionFiltersValues[i] == 0 {
-				ItinerarioExposicionFiltersValues[i] = nil
-			}
-		}
-		if ItinerarioExposicionValues[2] == "" {
-			ItinerarioExposicionValues[2] = nil
-		}
-		if ItinerarioExposicionFiltersValues[2] == "" {
-			ItinerarioExposicionFiltersValues[2] = nil
-		}
+		ItinerarioExposicionFilters,ItinerarioExposicionFiltersValues :=utilities.ObjectFields(lastItinerarioExposicion)
+		ItinerarioExposicionStrings,ItinerarioExposicionValues := utilities.ObjectFields(newItinerarioExposicion)
 
 		ItinerarioExposicionRows, err := utilities.UpdateObject("ItinerarioExposicion", ItinerarioExposicionFilters, ItinerarioExposicionFiltersValues, ItinerarioExposicionStrings, ItinerarioExposicionValues)
 		if err == nil {

@@ -23,10 +23,7 @@ func CreateEditorial(writter http.ResponseWriter, request *http.Request) {
 		json.Set("Message", err.Error())
 	}
 
-	var editorialValues []interface{}
-	var editorialStrings []string
-	editorialValues = utilities.ObjectValues(Editorial)
-	editorialStrings = utilities.ObjectFields(Editorial)
+	editorialStrings, editorialValues := utilities.ObjectFields(Editorial)
 
 	result, err := utilities.InsertObject("Editorial", editorialValues, editorialStrings)
 	if err != nil {
@@ -57,10 +54,7 @@ func GetEditorial(writter http.ResponseWriter, request *http.Request) {
 
 	if err == nil {
 
-		var editorialValues []interface{}
-		var editorialStrings []string
-		editorialValues = utilities.ObjectValues(Editorial)
-		editorialStrings = utilities.ObjectFields(Editorial)
+		editorialStrings, editorialValues := utilities.ObjectFields(Editorial)
 
 		//Limpia de los atributos del objeto
 		if editorialValues[0] == 0 {
@@ -73,7 +67,15 @@ func GetEditorial(writter http.ResponseWriter, request *http.Request) {
 			}
 		}
 
-		editorialRows, err := utilities.GetObject([]string{"Editorial"}, nil, editorialStrings, editorialValues)
+		var editorialQuery models.GetQuery
+
+		editorialQuery.Tables = []string{"Editorial"}
+		editorialQuery.Selects = nil
+		editorialQuery.Params = [][]string{editorialStrings}
+		editorialQuery.Values = [][]interface{}{editorialValues}
+		editorialQuery.Conditions = nil
+
+		editorialRows, err := utilities.GetObject(editorialQuery)
 		if err == nil {
 			editorialResultado, err := QueryToEditorial(editorialRows)
 			if err == nil {
@@ -119,17 +121,9 @@ func UpdateEditorial(writter http.ResponseWriter, request *http.Request) {
 		editorialFilters = append(editorialFilters, "ID")
 		editorialFiltersValues = append(editorialFiltersValues, editorial.ID)
 
-		var editorialValues []interface{}
-		var editorialStrings []string
+		editorial.ID=0
 
-		editorialValues = utilities.ObjectValues(editorial)
-		editorialStrings = utilities.ObjectFields(editorial)
-
-		editorialValues[0] = nil
-
-		if editorialValues[1] == "" {
-			editorialValues[1] = nil
-		}
+		editorialStrings, editorialValues := utilities.ObjectFields(editorial)
 
 		editorialRows, err := utilities.UpdateObject("Editorial", editorialFilters, editorialFiltersValues, editorialStrings, editorialValues)
 		if err == nil {

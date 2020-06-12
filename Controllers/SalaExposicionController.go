@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/bitly/go-simplejson"
+	"github.com/mitchellh/mapstructure"
 
 	models "../Models"
 	utilities "../Utilities"
@@ -23,10 +24,7 @@ func CreateSalaExposicion(writter http.ResponseWriter, request *http.Request) {
 		json.Set("Message", err.Error())
 	}
 
-	var SalaExposicionValues []interface{}
-	var SalaExposicionestrings []string
-	SalaExposicionValues = utilities.ObjectValues(SalaExposicion)
-	SalaExposicionestrings = utilities.ObjectFields(SalaExposicion)
+	SalaExposicionestrings,SalaExposicionValues := utilities.ObjectFields(SalaExposicion)
 
 	result, err := utilities.InsertObject("SalaExposicion", SalaExposicionValues, SalaExposicionestrings)
 	if err != nil {
@@ -79,6 +77,52 @@ func GetSalaExposicion(writter http.ResponseWriter, request *http.Request) {
 			} else {
 				jsonResponse.Set("Exito", false)
 				jsonResponse.Set("Message", err.Error())
+			}
+
+		} else {
+			jsonResponse.Set("Exito", false)
+			jsonResponse.Set("Message", err.Error())
+		}
+
+	} else {
+		jsonResponse.Set("Exito", false)
+		jsonResponse.Set("Message", err.Error())
+	}
+
+	payload, err := jsonResponse.MarshalJSON()
+	writter.Header().Set("Content-Type", "application/json")
+	writter.Write(payload)
+	return
+}
+
+//UpdateSalaExposicion : Metodo que actualiza SalaExposicion segun parametros
+func UpdateSalaExposicion(writter http.ResponseWriter, request *http.Request) {
+	var lastSalaExposicion models.SalaExposicion
+	var newSalaExposicion models.SalaExposicion
+	var recipient map[string]interface{}
+	err := json.NewDecoder(request.Body).Decode(&recipient)
+	jsonResponse := simplejson.New()
+	if err == nil {
+
+		mapstructure.Decode(recipient["filter"], &lastSalaExposicion)
+		mapstructure.Decode(recipient["update"], &newSalaExposicion)
+
+		SalaExposicionFilters,SalaExposicionFiltersValues :=utilities.ObjectFields(lastSalaExposicion)
+		SalaExposicionStrings,SalaExposicionValues := utilities.ObjectFields(newSalaExposicion)
+
+		SalaExposicionRows, err := utilities.UpdateObject("SalaExposicion", SalaExposicionFilters, SalaExposicionFiltersValues, SalaExposicionStrings, SalaExposicionValues)
+		if err == nil {
+
+			if SalaExposicionRows {
+
+				jsonResponse.Set("Exito", true)
+				jsonResponse.Set("Message", "SalaExposicion actualizado")
+
+			} else {
+
+				jsonResponse.Set("Exito", false)
+				jsonResponse.Set("Message", err.Error())
+
 			}
 
 		} else {

@@ -23,10 +23,7 @@ func CreateTipoExposicion(writter http.ResponseWriter, request *http.Request) {
 		json.Set("Message", err.Error())
 	}
 
-	var TipoExposicionValues []interface{}
-	var TipoExposicionStrings []string
-	TipoExposicionValues = utilities.ObjectValues(TipoExposicion)
-	TipoExposicionStrings = utilities.ObjectFields(TipoExposicion)
+	TipoExposicionStrings,TipoExposicionValues := utilities.ObjectFields(TipoExposicion)
 
 	result, err := utilities.InsertObject("TiposExposicion", TipoExposicionValues, TipoExposicionStrings)
 	if err != nil {
@@ -57,24 +54,17 @@ func GetTiposExposicion(writter http.ResponseWriter, request *http.Request) {
 	jsonResponse := simplejson.New()
 	if err == nil {
 
-		var TiposExposicionValues []interface{}
-		var TiposExposicionStrings []string
-		TiposExposicionValues = utilities.ObjectValues(TiposExposicion)
-		TiposExposicionStrings = utilities.ObjectFields(TiposExposicion)
+		TiposExposicionStrings,TiposExposicionValues := utilities.ObjectFields(TiposExposicion)
 
+		var TiposExposicionQuery models.GetQuery
+		
+		TiposExposicionQuery.Tables=[]string{"TiposExposicion"}
+		TiposExposicionQuery.Selects=nil
+		TiposExposicionQuery.Params=[][]string{TiposExposicionStrings}
+		TiposExposicionQuery.Values=[][]interface{}{TiposExposicionValues}
+		TiposExposicionQuery.Conditions=nil
 
-		//Limpia de los atributos del objeto
-		if TiposExposicionValues[0] == 0 {
-			TiposExposicionValues[0] = nil
-		}
-
-		for i := 1; i < len(TiposExposicionStrings); i++ {
-			if TiposExposicionValues[i] == "" {
-				TiposExposicionValues[i] = nil
-			}
-		}
-
-		TiposExposicionRows, err := utilities.GetObject([]string{"TiposExposicion"}, nil, TiposExposicionStrings, TiposExposicionValues)
+		TiposExposicionRows, err := utilities.GetObject(TiposExposicionQuery)
 		if err == nil {
 			TiposExposicionesResultado, err := QueryToTiposExposicion(TiposExposicionRows)
 			if err == nil {
@@ -119,18 +109,11 @@ func UpdateTiposExposicion(writter http.ResponseWriter, request *http.Request) {
 
 		TiposExposicionFilters = append(TiposExposicionFilters, "ID")
 		TiposExposicionFiltersValues = append(TiposExposicionFiltersValues, TiposExposicion.ID)
+		
+		TiposExposicion.ID=0
 
-		var TiposExposicionValues []interface{}
-		var TiposExposicionStrings []string
+		TiposExposicionStrings,TiposExposicionValues := utilities.ObjectFields(TiposExposicion)
 
-		TiposExposicionValues = utilities.ObjectValues(TiposExposicion)
-		TiposExposicionStrings = utilities.ObjectFields(TiposExposicion)
-
-		TiposExposicionValues[0] = nil
-
-		if TiposExposicionValues[1] == "" {
-			TiposExposicionValues[1] = nil
-		}
 
 		TiposExposicionRows, err := utilities.UpdateObject("TiposExposicion", TiposExposicionFilters, TiposExposicionFiltersValues, TiposExposicionStrings, TiposExposicionValues)
 		if err == nil {

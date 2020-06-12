@@ -20,6 +20,7 @@ func main() {
 	router.HandleFunc("/Editorial/update", controllers.UpdateEditorial).Methods("PUT")
 	router.HandleFunc("/Exposicion/create", controllers.CreateExposicion).Methods("POST")
 	router.HandleFunc("/Exposicion/get", controllers.GetExposicion).Methods("POST")
+	router.HandleFunc("/Exposicion/fullGet", controllers.GetExposicionWithType).Methods("POST")
 	router.HandleFunc("/Exposicion/update", controllers.UpdateExposicion).Methods("PUT")
 	router.HandleFunc("/TipoTaller/create",controllers.CreateTiposTalleres).Methods("POST")
 	router.HandleFunc("/TipoTaller/get",controllers.GetTiposTalleres).Methods("POST")
@@ -39,6 +40,7 @@ func main() {
 	router.HandleFunc("/Sala/update", controllers.UpdateSala).Methods("PUT")
 	router.HandleFunc("/SalaExposicion/create", controllers.CreateSalaExposicion).Methods("POST")
 	router.HandleFunc("/SalaExposicion/get", controllers.GetSalaExposicion).Methods("POST")
+	router.HandleFunc("/SalaExposicion/update", controllers.UpdateSalaExposicion).Methods("PUT")
 	router.HandleFunc("/SalaTaller/create", controllers.CreateSalaTaller).Methods("POST")
 	router.HandleFunc("/SalaTaller/get", controllers.GetSalaTaller).Methods("POST")
 	router.HandleFunc("/Taller/create", controllers.CreateTaller).Methods("POST")
@@ -64,6 +66,7 @@ func main() {
 	router.HandleFunc("/EditorialLibro/update", controllers.UpdateEditorialLibro).Methods("PUT")
 	router.HandleFunc("/SelloLibro/create", controllers.CreateSelloLibro).Methods("POST")
 	router.HandleFunc("/SelloLibro/get", controllers.GetSelloLibro).Methods("POST")
+	router.HandleFunc("/SelloLibro/update", controllers.UpdateSelloLibro).Methods("PUT")
 
 	log.Fatal(http.ListenAndServe(
 		":8080", 

@@ -2,8 +2,8 @@ package controllers
 
 import (
 	"database/sql"
-	"fmt"
 	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"github.com/bitly/go-simplejson"
@@ -11,8 +11,6 @@ import (
 	models "../Models"
 	utilities "../Utilities"
 )
-
-
 
 //CreateExposicion : Metodo de insercion de una nueva Exposicion
 func CreateExposicion(writter http.ResponseWriter, request *http.Request) {
@@ -26,10 +24,7 @@ func CreateExposicion(writter http.ResponseWriter, request *http.Request) {
 		json.Set("Message", err.Error())
 	}
 
-	var ExposicionValues []interface{}
-	var ExposicionStrings []string
-	ExposicionValues = utilities.ObjectValues(Exposicion)
-	ExposicionStrings = utilities.ObjectFields(Exposicion)
+	ExposicionStrings, ExposicionValues := utilities.ObjectFields(Exposicion)
 
 	result, err := utilities.InsertObject("Exposicion", ExposicionValues, ExposicionStrings)
 	if err != nil {
@@ -59,30 +54,70 @@ func GetExposicion(writter http.ResponseWriter, request *http.Request) {
 	jsonResponse := simplejson.New()
 	if err == nil {
 
-		var expValues []interface{}
-		var expStrings []string
-		expValues = utilities.ObjectValues(exposicion)
-		expStrings = utilities.ObjectFields(exposicion)
+		expStrings, expValues := utilities.ObjectFields(exposicion)
 
-		fmt.Println(expStrings)
-		fmt.Println(expValues)
+		var exposicionQuery models.GetQuery
 
-		//Limpia de los atributos del objeto
-		for i := 0; i < 3; i++ {
-			if expValues[i] == 0 {
-				expValues[i] = nil
-			}
-		}
+		exposicionQuery.Tables = []string{"Exposicion"}
+		exposicionQuery.Selects = nil
+		exposicionQuery.Params = [][]string{expStrings}
+		exposicionQuery.Values = [][]interface{}{expValues}
+		exposicionQuery.Conditions = nil
 
-		for i := 3; i < 5; i++ {
-			if expValues[i] == "" {
-				expValues[i] = nil
-			}
-		}
-
-		expRows, err := utilities.GetObject([]string{"Exposicion"}, nil, expStrings, expValues)
+		expRows, err := utilities.GetObject(exposicionQuery)
 		if err == nil {
 			exposicionesResultado, err := QueryToExposicion(expRows)
+			fmt.Println(exposicionesResultado)
+			if err == nil {
+				if len(exposicionesResultado) > 0 {
+					jsonResponse.Set("Exito", true)
+					jsonResponse.Set("Message", "exposiciones encontradas")
+					jsonResponse.Set("Libros", exposicionesResultado)
+				} else {
+					jsonResponse.Set("Exito", false)
+					jsonResponse.Set("Message", "No se encontraron exposiciones")
+				}
+			} else {
+				jsonResponse.Set("Exito", false)
+				jsonResponse.Set("Message", err.Error())
+			}
+
+		} else {
+			jsonResponse.Set("Exito", false)
+			jsonResponse.Set("Message", err.Error())
+		}
+
+	} else {
+		jsonResponse.Set("Exito", false)
+		jsonResponse.Set("Message", err.Error())
+	}
+
+	payload, err := jsonResponse.MarshalJSON()
+	writter.Header().Set("Content-Type", "application/json")
+	writter.Write(payload)
+	return
+}
+
+//GetExposicionWithType : Metodo que regresa Stanes con el desgloce de la editorial segun parametros
+func GetExposicionWithType(writter http.ResponseWriter, request *http.Request) {
+	var exposicion models.Exposicion
+	err := json.NewDecoder(request.Body).Decode(&exposicion)
+	jsonResponse := simplejson.New()
+	if err == nil {
+
+		expStrings, expValues := utilities.ObjectFields(exposicion)
+
+		var exposicionQuery models.GetQuery
+
+		exposicionQuery.Tables = []string{"Exposicion", "TiposExposicion"}
+		exposicionQuery.Selects = [][]string{[]string{"ID", "Duracion", "Titulo", "Presentador"}, []string{"Descripcion"}}
+		exposicionQuery.Params = [][]string{expStrings}
+		exposicionQuery.Values = [][]interface{}{expValues}
+		exposicionQuery.Conditions = []string{"TiposExposicion.ID=Exposicion.IDTipo"}
+
+		expRows, err := utilities.GetObject(exposicionQuery)
+		if err == nil {
+			exposicionesResultado, err := QueryToFullExposicion(expRows)
 			fmt.Println(exposicionesResultado)
 			if err == nil {
 				if len(exposicionesResultado) > 0 {
@@ -127,25 +162,8 @@ func UpdateExposicion(writter http.ResponseWriter, request *http.Request) {
 		ExposicionFilters = append(ExposicionFilters, "ID")
 		ExposicionFiltersValues = append(ExposicionFiltersValues, Exposicion.ID)
 
-		var ExposicionValues []interface{}
-		var ExposicionStrings []string
-
-		ExposicionValues = utilities.ObjectValues(Exposicion)
-		ExposicionStrings = utilities.ObjectFields(Exposicion)
-
-		ExposicionValues[0] = nil
-
-		for i := 1; i < 3; i++ {
-			if ExposicionValues[i] == 0 {
-				ExposicionValues[i] = nil
-			}
-		}
-
-		for i := 3; i < 5; i++ {
-			if ExposicionValues[i] == "" {
-				ExposicionValues[i] = nil
-			}
-		}
+		Exposicion.ID=0
+		ExposicionStrings,ExposicionValues := utilities.ObjectFields(Exposicion)
 
 		ExposicionRows, err := utilities.UpdateObject("Exposicion", ExposicionFilters, ExposicionFiltersValues, ExposicionStrings, ExposicionValues)
 		if err == nil {
@@ -192,6 +210,32 @@ func QueryToExposicion(result *sql.Rows) ([]models.Exposicion, error) {
 	return recipents, nil
 }
 
+//QueryToFullExposicion : Metodo que transforma la consulta a objetos Exposicion
+func QueryToFullExposicion(result *sql.Rows) ([]map[string]interface{}, error) {
+	var exposicionAux models.Exposicion
+	var tipoExpAux models.TiposExposicion
+	var recipents []map[string]interface{}
+	for result.Next() {
+		err := result.Scan(
+			&exposicionAux.ID,
+			&exposicionAux.Duracion,
+			&exposicionAux.Titulo,
+			&exposicionAux.Presentador,
+			&tipoExpAux.Descripcion)
+		if err != nil {
+			return nil, err
+		}
+		recipents = append(recipents, map[string]interface{}{
+			"id":          exposicionAux.ID,
+			"duracion":    exposicionAux.Duracion,
+			"titulo":      exposicionAux.Titulo,
+			"presentador": exposicionAux.Presentador,
+			"descripcion": tipoExpAux.Descripcion,
+		})
+	}
+	return recipents, nil
+}
+
 //ExposicionToInterfaces : metodo que transforma un arreglo de Exposicion en interfaces
 func ExposicionToInterfaces(Exposicion []models.Exposicion) []interface{} {
 	var arrayInterface []interface{}
@@ -202,4 +246,3 @@ func ExposicionToInterfaces(Exposicion []models.Exposicion) []interface{} {
 	}
 	return arrayInterface
 }
-

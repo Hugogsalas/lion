@@ -22,10 +22,7 @@ func CreateSala(writter http.ResponseWriter, request *http.Request) {
 		json.Set("Message", err.Error())
 	}
 
-	var salaValues []interface{}
-	var salaStrings []string
-	salaValues = utilities.ObjectValues(sala)
-	salaStrings = utilities.ObjectFields(sala)
+	salaStrings,salaValues := utilities.ObjectFields(sala)
 
 	result, err := utilities.InsertObject("sala", salaValues, salaStrings)
 	if err != nil {
@@ -56,22 +53,18 @@ func GetSala(writter http.ResponseWriter, request *http.Request) {
 	jsonResponse := simplejson.New()
 	if err == nil {
 
-		var SalaValues []interface{}
-		var SalaStrings []string
-		SalaValues = utilities.ObjectValues(Sala)
-		SalaStrings = utilities.ObjectFields(Sala)
+		SalaStrings,SalaValues := utilities.ObjectFields(Sala)
 
+		var SalaQuery models.GetQuery
+		
+		SalaQuery.Tables=[]string{"Sala"}
+		SalaQuery.Selects=nil
+		SalaQuery.Params=[][]string{SalaStrings}
+		SalaQuery.Values=[][]interface{}{SalaValues}
+		SalaQuery.Conditions=nil
+		
 
-		//Limpia de los atributos del objeto
-	
-		if SalaValues[0] == 0 {
-			SalaValues[0] = nil
-		}
-		if SalaValues[1] == "" {
-			SalaValues[1] = nil
-		}
-
-		SalaRows, err := utilities.GetObject([]string{"Sala"}, nil, SalaStrings, SalaValues)
+		SalaRows, err := utilities.GetObject(SalaQuery)
 		if err == nil {
 			SalasResultado, err := QueryToSala(SalaRows)
 			if err == nil {
@@ -117,11 +110,9 @@ func UpdateSala(writter http.ResponseWriter, request *http.Request) {
 		SalaFilters = append(SalaFilters, "ID")
 		SalaFiltersValues = append(SalaFiltersValues, Sala.ID)
 
-		var SalaValues []interface{}
-		var SalaStrings []string
+		Sala.ID=0
 
-		SalaValues = utilities.ObjectValues(Sala)
-		SalaStrings = utilities.ObjectFields(Sala)
+		SalaStrings,SalaValues := utilities.ObjectFields(Sala)
 
 		SalaValues[0] = nil
 
