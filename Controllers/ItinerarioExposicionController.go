@@ -23,7 +23,7 @@ func CreateItinerarioExposicion(writter http.ResponseWriter, request *http.Reque
 		json.Set("Message", err.Error())
 	}
 
-	itinerarioExposicionStrings,itinerarioExposicionValues := utilities.ObjectFields(itinerarioExposicion)
+	itinerarioExposicionStrings, itinerarioExposicionValues := utilities.ObjectFields(itinerarioExposicion)
 
 	result, err := utilities.InsertObject("itinerarioExposicion", itinerarioExposicionValues, itinerarioExposicionStrings)
 	if err != nil {
@@ -31,9 +31,10 @@ func CreateItinerarioExposicion(writter http.ResponseWriter, request *http.Reque
 		json.Set("Message", err.Error())
 	}
 
-	if result {
+	if result==0 && err==nil {
 		json.Set("Exito", true)
 		json.Set("Message", "ItinerarioExposicion Creada")
+		json.Set("Id", result)
 	}
 
 	payload, err := json.MarshalJSON()
@@ -114,8 +115,8 @@ func UpdateItinerarioExposicion(writter http.ResponseWriter, request *http.Reque
 		mapstructure.Decode(recipient["filter"], &lastItinerarioExposicion)
 		mapstructure.Decode(recipient["update"], &newItinerarioExposicion)
 
-		ItinerarioExposicionFilters,ItinerarioExposicionFiltersValues :=utilities.ObjectFields(lastItinerarioExposicion)
-		ItinerarioExposicionStrings,ItinerarioExposicionValues := utilities.ObjectFields(newItinerarioExposicion)
+		ItinerarioExposicionFilters, ItinerarioExposicionFiltersValues := utilities.ObjectFields(lastItinerarioExposicion)
+		ItinerarioExposicionStrings, ItinerarioExposicionValues := utilities.ObjectFields(newItinerarioExposicion)
 
 		ItinerarioExposicionRows, err := utilities.UpdateObject("ItinerarioExposicion", ItinerarioExposicionFilters, ItinerarioExposicionFiltersValues, ItinerarioExposicionStrings, ItinerarioExposicionValues)
 		if err == nil {
@@ -187,7 +188,6 @@ func DeleteItinerarioExposicion(writter http.ResponseWriter, request *http.Reque
 	writter.Write(payload)
 	return
 }
-
 
 //ItinerariowithExposicion : metodo que retorna una relacion Itinerario-Exposicion
 func ItinerariowithExposicion(result *sql.Rows) ([]map[string]interface{}, error) {

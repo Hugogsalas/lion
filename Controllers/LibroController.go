@@ -30,9 +30,10 @@ func CreateLibro(writter http.ResponseWriter, request *http.Request) {
 		json.Set("Message", err.Error())
 	}
 
-	if result {
+	if result!=0 {
 		json.Set("Exito", true)
 		json.Set("Message", "Libro añadido")
+		json.Set("Id", result)
 	}
 
 	payload, err := json.MarshalJSON()

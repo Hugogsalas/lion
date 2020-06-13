@@ -23,7 +23,7 @@ func CreateItinerarioTaller(writter http.ResponseWriter, request *http.Request) 
 		json.Set("Message", err.Error())
 	}
 
-	itinerarioTallerStrings,itinerarioTallerValues := utilities.ObjectFields(itinerarioTaller)
+	itinerarioTallerStrings, itinerarioTallerValues := utilities.ObjectFields(itinerarioTaller)
 
 	result, err := utilities.InsertObject("ItinerarioTaller", itinerarioTallerValues, itinerarioTallerStrings)
 	if err != nil {
@@ -31,9 +31,10 @@ func CreateItinerarioTaller(writter http.ResponseWriter, request *http.Request) 
 		json.Set("Message", err.Error())
 	}
 
-	if result {
+	if result==0 && err==nil {
 		json.Set("Exito", true)
 		json.Set("Message", "ItinerarioTaller Creada")
+		json.Set("Id", result)
 	}
 
 	payload, err := json.MarshalJSON()
@@ -68,7 +69,7 @@ func GetItinerarioTaller(writter http.ResponseWriter, request *http.Request) {
 			} else if ItinerarioTaller.IDItinerario == 0 {
 
 				ItinerarioTallerResultado, err = TallerWithItinerarios(ItinerarioTallerRows)
-			}else{
+			} else {
 
 				ItinerarioTallerResultado, err = ItinerariowithTaller(ItinerarioTallerRows)
 			}
@@ -115,9 +116,9 @@ func UpdateItinerarioTaller(writter http.ResponseWriter, request *http.Request) 
 		mapstructure.Decode(recipient["filter"], &lastItinerarioTaller)
 		mapstructure.Decode(recipient["update"], &newItinerarioTaller)
 
-		ItinerarioTallerFilters,ItinerarioTallerFiltersValues :=utilities.ObjectFields(lastItinerarioTaller)
+		ItinerarioTallerFilters, ItinerarioTallerFiltersValues := utilities.ObjectFields(lastItinerarioTaller)
 
-		ItinerarioTallerStrings,ItinerarioTallerValues := utilities.ObjectFields(newItinerarioTaller)
+		ItinerarioTallerStrings, ItinerarioTallerValues := utilities.ObjectFields(newItinerarioTaller)
 
 		ItinerarioTallerRows, err := utilities.UpdateObject("ItinerarioTaller", ItinerarioTallerFilters, ItinerarioTallerFiltersValues, ItinerarioTallerStrings, ItinerarioTallerValues)
 		if err == nil {

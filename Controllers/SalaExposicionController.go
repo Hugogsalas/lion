@@ -24,7 +24,7 @@ func CreateSalaExposicion(writter http.ResponseWriter, request *http.Request) {
 		json.Set("Message", err.Error())
 	}
 
-	SalaExposicionestrings,SalaExposicionValues := utilities.ObjectFields(SalaExposicion)
+	SalaExposicionestrings, SalaExposicionValues := utilities.ObjectFields(SalaExposicion)
 
 	result, err := utilities.InsertObject("SalaExposicion", SalaExposicionValues, SalaExposicionestrings)
 	if err != nil {
@@ -32,9 +32,10 @@ func CreateSalaExposicion(writter http.ResponseWriter, request *http.Request) {
 		json.Set("Message", err.Error())
 	}
 
-	if result {
+	if result==0 && err==nil {
 		json.Set("Exito", true)
 		json.Set("Message", "Sala-Exposicion creado")
+		json.Set("Id", result)
 	}
 
 	payload, err := json.MarshalJSON()
@@ -107,8 +108,8 @@ func UpdateSalaExposicion(writter http.ResponseWriter, request *http.Request) {
 		mapstructure.Decode(recipient["filter"], &lastSalaExposicion)
 		mapstructure.Decode(recipient["update"], &newSalaExposicion)
 
-		SalaExposicionFilters,SalaExposicionFiltersValues :=utilities.ObjectFields(lastSalaExposicion)
-		SalaExposicionStrings,SalaExposicionValues := utilities.ObjectFields(newSalaExposicion)
+		SalaExposicionFilters, SalaExposicionFiltersValues := utilities.ObjectFields(lastSalaExposicion)
+		SalaExposicionStrings, SalaExposicionValues := utilities.ObjectFields(newSalaExposicion)
 
 		SalaExposicionRows, err := utilities.UpdateObject("SalaExposicion", SalaExposicionFilters, SalaExposicionFiltersValues, SalaExposicionStrings, SalaExposicionValues)
 		if err == nil {
@@ -220,7 +221,7 @@ func SalaWithExposiciones(result *sql.Rows) ([]map[string]interface{}, error) {
 		} else {
 			var lastExposiciones []map[string]interface{}
 			lastExposiciones = response[index]["Exposiciones"].([]map[string]interface{})
-			response[index]["Exposiciones"] = append(lastExposiciones,map[string]interface{}{
+			response[index]["Exposiciones"] = append(lastExposiciones, map[string]interface{}{
 				"id":          ExposicionAux.ID,
 				"duracion":    ExposicionAux.Duracion,
 				"descripcion": tipoAux.Descripcion,

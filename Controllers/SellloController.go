@@ -31,9 +31,10 @@ func CreateSello(writter http.ResponseWriter, request *http.Request) {
 		json.Set("Message", err.Error())
 	}
 
-	if result {
+	if result !=0{
 		json.Set("Exito", true)
 		json.Set("Message", "Sello creado")
+		json.Set("Id", result)
 	}
 
 	payload, err := json.MarshalJSON()

@@ -11,7 +11,7 @@ import (
 )
 
 //ExecuteCommand : Metodo de execucion de un query que no retorna nada
-func ExecuteCommand(command string) (interface{}, error) {
+func ExecuteCommand(command string) (sql.Result, error) {
 	fmt.Println(command)
 	db, err := sql.Open("mysql", "root:3$trella@tcp(127.0.0.1:3306)/lioness")
 	if err != nil {
@@ -41,7 +41,7 @@ func ExecuteQuery(command string) (*sql.Rows, error) {
 }
 
 //InsertObject : inserta un objeto en la tabla especificada
-func InsertObject(table string, values []interface{}, fields []string) (bool, error) {
+func InsertObject(table string, values []interface{}, fields []string) (int64, error) {
 	var command string
 
 	command = "INSERT INTO " + table + " ("
@@ -78,14 +78,14 @@ func InsertObject(table string, values []interface{}, fields []string) (bool, er
 	}
 	result, err := ExecuteCommand(command)
 	if err != nil {
-		return false, err
-	} else {
-		if result != nil {
-			return true, nil
-		} else {
-			return false, nil
-		}
+		return 0, err
 	}
+	IDinsert, err := result.LastInsertId()
+
+	if err != nil {
+		return 0, err
+	}
+	return IDinsert, nil
 }
 
 //GetObject : metodo que retorna un objeto segun parametros

@@ -32,9 +32,10 @@ func CreateAutorLibro(writter http.ResponseWriter, request *http.Request) {
 		json.Set("Message", err.Error())
 	}
 
-	if result {
+	if result==0 && err==nil {
 		json.Set("Exito", true)
 		json.Set("Message", "AutorLibro creado")
+		json.Set("Id", result)
 	}
 
 	payload, err := json.MarshalJSON()
